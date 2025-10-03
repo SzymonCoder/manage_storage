@@ -1,0 +1,128 @@
+services:
+
+  # --------------------------------------------------------------------------------------------------------------------
+  # APLIKACJA WEBOWA STORAGE
+  # --------------------------------------------------------------------------------------------------------------------
+  storage-webapp:
+    restart: always
+    build:
+      context: ./storage
+      dockerfile: Dockerfile
+    volumes:
+      - ./storage:/app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - storage_network
+
+#  # --------------------------------------------------------------------------------------------------------------------
+#  # APLIKACJA WEBOWA USERS
+#  # --------------------------------------------------------------------------------------------------------------------
+#  users-webapp:
+#    restart: always
+#    build:
+#      context: ./users
+#      dockerfile: Dockerfile
+#    depends_on:
+#      mongo:
+#        condition: service_healthy
+#    volumes:
+#      - ./users:/app
+#    networks:
+#      - km-network
+
+#  # --------------------------------------------------------------------------------------------------------------------
+#  # APLIKACJA WEBOWA API GATEWAY
+#  # --------------------------------------------------------------------------------------------------------------------
+#  api-gateway-webapp:
+#    restart: always
+#    build:
+#      context: ./api-gateway
+#      dockerfile: Dockerfile
+#    volumes:
+#      - ./api-gateway:/app
+#    networks:
+#      - km-network
+
+
+#  # --------------------------------------------------------------------------------------------------------------------
+#  # NGINX
+#  # --------------------------------------------------------------------------------------------------------------------
+#  nginx:
+#    restart: always
+#    image: nginx:latest
+#    volumes:
+#      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+#    ports:
+#      - "80:80"
+#    depends_on:
+#      - storage-webapp
+#    networks:
+#      - storage_network
+
+  # --------------------------------------------------------------------------------------------------------------------
+  # MYSQL
+  # --------------------------------------------------------------------------------------------------------------------
+  mysql:
+    image: mysql:latest
+    restart: always
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_TCP_PORT: ${MYSQL_PORT}
+      TZ: Europe/Warsaw
+    ports:
+      - "3307:3307"
+    expose:
+      - 3307
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u $$MYSQL_USER --password=$$MYSQL_PASSWORD || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - storage_network
+
+
+networks:
+  storage_network:
+
+volumes:
+  mysql:
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Instalacja dependencies
+# >> poetry install --with dev
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Uruchom kontenery:
+# >> docker-compose up -d --build
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Podejrzyj logi:
+# >> docker-compose logs -f
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Tworzenie / wdrazanie migracji
+
+# Inicjalizacja migrations:
+# >> docker exec -it [container id] bash
+# >> flask db init
+
+# Tworzenie pierwszej migracji
+# >> docker-compose exec orders-webapp flask db migrate -m "Store schema created"
+# >> docker-compose exec orders-webapp flask db upgrade
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Ladowanie danych poczatkowych (nie musisz tego robic, ale chce pokazac, jak to zrobic)
+# >> docker-compose cp db/seed/seed.sql mysql:/seed.sql
+# >> docker-compose exec mysql sh -lc 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" < /seed.sql'
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Testowanie
+# >> poetry run pytest --cov=webapp --cov-report=html
