@@ -83,12 +83,25 @@ class Config:
         "max_overflow": 20,
     }
 
-    @staticmethod
-    def init_app(app):
-        """Metoda do dodatkowej inicjalizacji specyficznej dla konfiguracji."""
-        pass
+    @classmethod
+    def init_app(cls, app: Flask) -> None:
+        # --------------------------------------------------------------------------------------------------------------
+        # Konfiguracja loggerow
+        # --------------------------------------------------------------------------------------------------------------
+        #cls.configure_logging(app)
 
-config = {
-    'default': Config
+        # --------------------------------------------------------------------------------------------------------------
+        # Teraz bedziemy wstrzykiwac konfiguracje dla bazy danych
+        # --------------------------------------------------------------------------------------------------------------
+        conf = cls()
+        app.config['SQLALCHEMY_DATABASE_URI'] = conf.SQLALCHEMY_DATABASE_URI
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = cls.SQLALCHEMY_TRACK_MODIFICATIONS
+        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = cls.SQLALCHEMY_ENGINE_OPTIONS
+
+        app.logger.debug('Logger initialized')
+
+
+config: dict[str, type[Config]] = {
+    'default': Config,
 }
 
