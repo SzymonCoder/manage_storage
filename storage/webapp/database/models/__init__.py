@@ -1,1 +1,1 @@
-from . import inbound_orders, inventories, products, suppliers, warehouses
+from . import inbound_orders, products_suppliers_info, products, suppliers, warehouses

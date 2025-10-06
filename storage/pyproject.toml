@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "storage"
+name = "webapp"
 version = "0.1.0"
 description = ""
 authors =  ["Szymon Turek email = szymonturek.codes@gmail.com"]

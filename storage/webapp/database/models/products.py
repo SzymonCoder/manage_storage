@@ -1,24 +1,28 @@
 from datetime import datetime
-from decimal import Decimal
 from sqlalchemy import String, DateTime, Integer, Numeric, Text, Boolean, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from storage.webapp.extensions import db
+from ...extensions import db
+from typing import TYPE_CHECKING
+
+# Ten blok jest widoczny tylko dla edytora kodu, a nie dla Pythona podczas uruchamiania.
+# Dzięki niemu edytor wie, czym jest 'ProductSupplierInfo'.
+if TYPE_CHECKING:
+    from .products_suppliers_info import ProductSupplierInfo
 
 
 
-#produkt ma miec id, sku, ean, nazwe produktu, data waznosci,
-#data stworzenia produktu w bazie danych, cena zakupu netto, waluta
 
 
-class Product(db.Model):
+class Product(db.Model):# type: ignore
     __tablename__ = "products"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     sku: Mapped[str] = mapped_column(String(25), unique=True, nullable=False)
     ean: Mapped[str] = mapped_column(String(14), unique=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    expiration_date: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    is_expiration_date: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_dose_product: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     description: Mapped[str] = mapped_column(Text, nullable=True, default=None)
 
 
@@ -31,6 +35,7 @@ class Product(db.Model):
         onupdate=func.now()
     )
 
-    inventories: Mapped[list["Inventory"]] = relationship(
-        back_populates="product"
+    products_suppliers_info: Mapped[list['ProductSupplierInfo']] = relationship(
+        back_populates="products"
     )
+

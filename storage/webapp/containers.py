@@ -1,0 +1,1 @@
+# plik z kontenerem dla repozytorium czy innych serwis tak by jeden kontenr byl odpalany w ramach jednej aplikacji
