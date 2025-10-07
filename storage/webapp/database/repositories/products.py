@@ -10,7 +10,7 @@ class ProductRepository(GenericRepository[Product]):
         super().__init__(Product)
 
 
-# ------------------------ Aktualizacje statusow ------------------------
+# ------------------------ Aktualizacje statusow i opisu ------------------------
 
     def set_exp_date_status(self, product: Product, status: bool) -> None:
         product.is_expiration_date = status
@@ -72,3 +72,5 @@ class ProductRepository(GenericRepository[Product]):
         stmt = select(Product).where(Product.is_active.is_(status))
         #alternatywa stmt = select(Product).where(Product.is_active == status)
         return list(db.session.scalars(stmt))
+
+# TODO: dodać filtr po słowie kluczowym z opisu, oraz z nazwy
