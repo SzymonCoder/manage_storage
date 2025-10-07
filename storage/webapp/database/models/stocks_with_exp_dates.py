@@ -1,7 +1,24 @@
 from datetime import datetime
+from enum import Enum as PyEnum
 from sqlalchemy import Integer, String, DateTime, Boolean, func, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ...extensions import db
+
+
+class StockQtyStatus(PyEnum):
+    GOOD = 'good_qty'
+    MEDIUM = 'medium_qty'
+    CRITICAL = 'critical_qty'
+    EMPTY = 'no_products'
+
+class ExpDateStatus(PyEnum):
+    GOOD = 'good_date'
+    MEDIUM = 'medium_date'
+    CRITICAL = 'critical_date'
+    EXPIRED = 'expired'
+    EMPTY = 'no_products'
+    NOT_APPLY= 'not_apply' # nie dotyczy tego produktu
+
 
 
 class StockWithExpDate(db.Model):
@@ -14,11 +31,16 @@ class StockWithExpDate(db.Model):
     qty_per_exp_date: Mapped[int] = mapped_column(Integer, nullable=True)
     qty_total_of_sku: Mapped[int] = mapped_column(Integer, nullable=True)
 
-    # takie powinny być statusy w exp_date_status:
-    # ('good_date', 'medium_date', 'critical_date', 'expired', 'no_products', 'N/D')
-    status_of_exp_date: Mapped[str] = mapped_column(String(50),nullable=False)
 
-    status_of_total_qty: Mapped[Enum] = mapped_column(Enum('good_qty', 'medium_qty', 'critical_qty', 'no_products'))
+    status_of_exp_date: Mapped[ExpDateStatus] = mapped_column(
+        Enum(ExpDateStatus,
+        name='exp_date_status')
+    )
+
+    status_of_total_qty: Mapped[StockQtyStatus] = mapped_column(
+        Enum(StockQtyStatus,
+        name='stock_qty_status')
+    )
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,

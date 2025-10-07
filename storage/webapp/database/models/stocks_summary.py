@@ -1,7 +1,14 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, DateTime, Boolean, func, ForeignKey, Enum
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+
+from sqlalchemy import Integer, DateTime, func, ForeignKey, Enum
+from sqlalchemy.orm import Mapped, mapped_column
+
 from ...extensions import db
+
+from .stocks_with_exp_dates import StockQtyStatus
+
+
 
 
 class StockSummary(db.Model):
@@ -18,7 +25,13 @@ class StockSummary(db.Model):
     expired_qty: Mapped[int] = mapped_column(Integer, nullable=True)
 
     qty_total_of_sku: Mapped[int] = mapped_column(Integer, nullable=True)
-    status_of_total_qty: Mapped[Enum] = mapped_column(Enum('good_qty', 'medium_qty', 'critical_qty', 'no_products'))
+    ordered_qty: Mapped[int] = mapped_column(Integer, nullable=True)
+
+
+    status_of_total_qty: Mapped[StockQtyStatus] = mapped_column(
+        Enum(StockQtyStatus, name='stock_qty_status')
+    )
+
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
