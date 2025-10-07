@@ -15,6 +15,7 @@ class Warehouse(db.Model):# type: ignore
     company_address: Mapped[str] = mapped_column(String(255), nullable=False)
     contact_person: Mapped[str] = mapped_column(String(255), nullable=False)
     area_phone_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    phone_number: Mapped[int] = mapped_column(Integer, nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False)
 

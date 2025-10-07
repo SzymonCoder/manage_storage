@@ -1,14 +1,15 @@
-from pydantic_core.core_schema import no_info_plain_validator_function
 from sqlalchemy import select
+from typing import Type
 from ...extensions import db
 from ..models.suppliers import Supplier
 from .generic import GenericRepository
+from flask_sqlalchemy.model import Model
 
 
 
 class SupplierRepository(GenericRepository[Supplier]):
-    def __init__(self):
-        super().__init__(Supplier)
+    def __init__(self, model: Type[Model] | None = None):
+        super().__init__(model or Supplier)
 
 
 # ------------------------ Aktualizacje statusow i opisu ------------------------

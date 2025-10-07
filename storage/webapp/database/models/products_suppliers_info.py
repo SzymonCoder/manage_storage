@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from .products import Product
     from .suppliers import Supplier
 
+
 #jest to sprawdzenie statyczny przez mypy wiec db.Model laczy sie w Alchemy i mypy tego nie ogarnia
 class ProductSupplierInfo(db.Model): # type: ignore
     __tablename__ = "products_suppliers_info"
@@ -19,6 +20,8 @@ class ProductSupplierInfo(db.Model): # type: ignore
     id_supplier: Mapped[int] = mapped_column(ForeignKey('suppliers.id'), primary_key=True)
     net_price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     currency: Mapped[str] = mapped_column(String(3), nullable=False)
+
+# TODO dodać currency jako pozycje z tabeli nowej, Currency, ktora pobiera aktualny stan currency wobec PLN
 
     production_time_days: Mapped[int] = mapped_column(Integer, nullable=False)
     production_delivery_days: Mapped[int] = mapped_column(Integer, nullable=False)
