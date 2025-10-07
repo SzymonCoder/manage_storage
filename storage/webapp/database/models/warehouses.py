@@ -25,3 +25,4 @@ class Warehouse(db.Model):# type: ignore
         server_default=func.now(),
         onupdate=func.now()
     )
+
