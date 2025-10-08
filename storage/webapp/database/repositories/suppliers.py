@@ -9,7 +9,7 @@ from flask_sqlalchemy.model import Model
 
 class SupplierRepository(GenericRepository[Supplier]):
     def __init__(self, model: Type[Model] | None = None):
-        super().__init__(model or Supplier)
+        super().__init__(Supplier)
 
 
 # ------------------------ Aktualizacje statusow i opisu ------------------------

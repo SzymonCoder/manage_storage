@@ -2,8 +2,12 @@ from datetime import datetime
 from sqlalchemy import Integer, String, DateTime, Boolean, func, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ...extensions import db
-
 from enum import Enum as PyEnum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .products import Product
+    from .suppliers import Supplier
 
 class InboundOrderStatus(PyEnum):
     CREATED = 'created'
@@ -15,14 +19,16 @@ class InboundOrderStatus(PyEnum):
     CANCELLED = 'cancelled'
 
 
-class InboundOrder(db.Model):
+class InboundOrder(db.Model): # type: ignore
     __tablename__ = "inbound_orders"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     supplier_id: Mapped[int] = mapped_column(ForeignKey('suppliers.id'), nullable=False)
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id'), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)
-    status: Mapped[InboundOrderStatus] = mapped_column(Enum(InboundOrderStatus, name='inbound_order_status'))
+    status: Mapped[InboundOrderStatus] = mapped_column(
+        Enum(InboundOrderStatus, name='inbound_order_status'),
+        default=InboundOrderStatus.CREATED)
     # user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False) #przy tworzeniu zamówienia, trzeba
     # zrobić takie cos: from flask_login import current_user
     # InboundOrder(user_id=current_user.id)
@@ -36,3 +42,8 @@ class InboundOrder(db.Model):
     )
 
     # user: Mapped["User"] = relationship("User", back_populates="orders")
+
+
+    supplier: Mapped["Supplier"] = relationship(back_populates='inbound_orders')
+    product: Mapped["Product"] = relationship(back_populates='inbound_orders')
+

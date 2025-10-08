@@ -2,6 +2,7 @@ from typing import Iterable
 from sqlalchemy import select
 from flask_sqlalchemy.model import Model
 from ...extensions import db
+from abc import ABC
 
 
 class GenericRepository[T: Model]:

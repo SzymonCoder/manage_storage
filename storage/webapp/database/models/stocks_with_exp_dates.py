@@ -21,7 +21,7 @@ class ExpDateStatus(PyEnum):
 
 
 
-class StockWithExpDate(db.Model):
+class StockWithExpDate(db.Model): # type: ignore
     __tablename__ = "stocks_with_exp_dates"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)

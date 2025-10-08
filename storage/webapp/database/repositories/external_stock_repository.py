@@ -1,0 +1,1 @@
+zrobienie repo do polaczenia z baza danych MySQL i modelowanie to do DTO

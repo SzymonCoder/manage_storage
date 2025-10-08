@@ -24,7 +24,7 @@ class ProductSupplierInfoRepository(GenericRepository[ProductSupplierInfo]):
     def edit_production_delivery_days(self, product_supplier_info: ProductSupplierInfo, days: int) -> None:
         product_supplier_info.production_delivery_days = days
 
-# ------------------------ Aktualizacje statusow i opisu ------------------------
+# ------------------------ Filtrowanie ------------------------
 
     def get_all_by_sku(self, sku: str ) -> list[ProductSupplierInfo] | None:
         stmt = select(ProductSupplierInfo).where(ProductSupplierInfo.id_product.is_(sku))

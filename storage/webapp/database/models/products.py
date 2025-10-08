@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 # Dzięki niemu edytor wie, czym jest 'ProductSupplierInfo'.
 if TYPE_CHECKING:
     from .products_suppliers_info import ProductSupplierInfo
-
+    from .inbound_orders import InboundOrder
 
 
 
@@ -42,8 +42,8 @@ class Product(db.Model):# type: ignore
                                       name='chk_days_of_dosage_of_product'),
                       )
 
+    inbound_orders: Mapped['InboundOrder'] = relationship(back_populates='product')
 
     products_suppliers_info: Mapped[list['ProductSupplierInfo']] = relationship(
-        back_populates="products"
-    )
+        back_populates="product")
 

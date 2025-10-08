@@ -20,7 +20,7 @@ class ProductRepository(GenericRepository[Product]):
     Zwraca liczbę zaktualizowanych wierszy.
     """
 
-    def bulk_exp_date_status(self, skus: list[str], status: bool) -> None:
+    def bulk_exp_date_status(self, skus: list[str], status: bool) -> None | int:
         stmt = (
             update(Product)
             .where(Product.id.in_(list(skus)))
@@ -36,7 +36,7 @@ class ProductRepository(GenericRepository[Product]):
         product.is_active = status
 
 
-    def bulk_active_status(self, skus: list[str], status: bool) -> None:
+    def bulk_active_status(self, skus: list[str], status: bool) -> None | int:
         stmt = (
             update(Product)
             .where(Product.id.in_(list(skus)))
@@ -66,7 +66,7 @@ class ProductRepository(GenericRepository[Product]):
 
     def get_by_sku(self, sku: int) -> Product | None:
         stmt = select(Product).where(Product.sku == sku)
-        return db.session.scalar(stmt).first()
+        return db.session.scalar(stmt)
 
     def get_all_by_active_status(self, status: bool) -> list[Product] | None:
         stmt = select(Product).where(Product.is_active.is_(status))

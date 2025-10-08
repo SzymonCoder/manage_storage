@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 # Dzięki niemu edytor wie, czym jest 'ProductSupplierInfo'.
 if TYPE_CHECKING:
     from .products_suppliers_info import ProductSupplierInfo
-
+    from .inbound_orders import InboundOrder
 
 class Supplier(db.Model):# type: ignore
     __tablename__ = "suppliers"
@@ -32,9 +32,13 @@ class Supplier(db.Model):# type: ignore
         onupdate=func.now()
     )
 
+    inbound_orders: Mapped[list['InboundOrder']] = relationship(back_populates='supplier')
+
     products_suppliers_info: Mapped[list['ProductSupplierInfo']] = relationship(
-        back_populates="products"
+        back_populates="supplier"
     )
+
+
 
     __table_args__ = (CheckConstraint('area_phone_number > 0 and area_phone_number < 999',
                                       name='chk_area_phone_number_max_4_positiv_digits'),

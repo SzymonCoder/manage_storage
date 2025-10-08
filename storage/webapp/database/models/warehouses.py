@@ -2,6 +2,10 @@ from datetime import datetime
 from sqlalchemy import Integer, String, DateTime, Boolean, func, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ...extensions import db
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .stocks_summary import StockSummary
 
 
 
@@ -26,4 +30,6 @@ class Warehouse(db.Model):# type: ignore
         server_default=func.now(),
         onupdate=func.now()
     )
+
+    stocks_summary: Mapped['StockSummary'] = relationship(back_populates='warehouse')
 
