@@ -2,9 +2,19 @@ from logging.config import dictConfig
 from dotenv import load_dotenv
 from flask import Flask
 from urllib.parse import quote_plus
+import json
+from pydantic import BaseModel, ValidationError
+from typing import Dict, Optional
 import os
 
 load_dotenv()
+
+class WarehouseExternalDBConfig(BaseModel):
+    uri: str
+    table_name: str
+    column_mappings: Dict[str, str]
+
+
 
 
 class Config:
@@ -24,6 +34,25 @@ class Config:
     MYSQL_PASSWORD: str = os.getenv('MYSQL_PASSWORD', 'user1234')
     MYSQL_ROOT_PASSWORD: str = os.getenv('MYSQL_ROOT_PASSWORD', 'root')
     MYSQL_PORT: str = os.getenv('MYSQL_PORT', '3307')
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # Zmienne środowiskowe zewnetrznych baz danych
+    # ------------------------------------------------------------------------------------------------------------------
+
+    WAREHOUSE_DB_CONFIGS: Dict[str, WarehouseExternalDBConfig] = {}
+
+    def __init__(self):
+        configs_json = os.getenv("WAREHOUSE_DB_CONFIGS")
+        if configs_json:
+            try:
+                raw_configs = json.loads(configs_json)
+                self.WAREHOUSE_DB_CONFIGS = {
+                    wh_id: WarehouseExternalDBConfig(**config_data)
+                    for wh_id, config_data in raw_configs.items()
+                }
+            except (json.JSONDecodeError, ValidationError) as e:
+                # W przyszłości można tu użyć loggera
+                print(f"BŁĄD: Nie udało się wczytać lub zwalidować WAREHOUSE_DB_CONFIGS_JSON: {e}")
 
     # ------------------------------------------------------------------------------------------------------------------
     # SQLALCHEMY DATABASE URI

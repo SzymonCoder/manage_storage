@@ -1,0 +1,5 @@
+
+
+
+class StockService:
+    pass
