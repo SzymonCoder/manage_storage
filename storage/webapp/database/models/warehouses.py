@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .stocks_summary import StockSummary
+    from .stocks_summary_arch import StockSummaryArch
 
 
 
@@ -32,4 +33,4 @@ class Warehouse(db.Model):# type: ignore
     )
 
     stocks_summary: Mapped['StockSummary'] = relationship(back_populates='warehouse')
-
+    stocks_summary_arch: Mapped['StockSummaryArch'] = relationship(back_populates='warehouse')

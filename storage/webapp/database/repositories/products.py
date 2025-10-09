@@ -73,4 +73,12 @@ class ProductRepository(GenericRepository[Product]):
         #alternatywa stmt = select(Product).where(Product.is_active == status)
         return list(db.session.scalars(stmt))
 
+    def get_dict_of_all_sku(self) -> dict[str, int]:
+        stmt = db.session.scalars(select(Product))
+        product_dict = {}
+        for p in stmt:
+            product_dict[p.sku] = p.id
+        return product_dict
+
+
 # TODO: dodać filtr po słowie kluczowym z opisu, oraz z nazwy
