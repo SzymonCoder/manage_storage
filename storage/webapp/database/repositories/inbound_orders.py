@@ -1,6 +1,6 @@
 from sqlalchemy import select, func
 from ...extensions import db
-from ..models.inbound_orders import InboundOrder, InboundOrderStatus
+from ..models.inbound_orders import InboundOrder, InboundOrderStatus, InbounOrderProduct
 from .generic import GenericRepository
 
 
@@ -19,6 +19,16 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
 
     def edit_product_id(self, order: InboundOrder, product_id: int) -> None:
         order.product_id = product_id
+
+
+    def add_product_to_inbound_order(self, order: InboundOrder, product_id: int, qty: int) -> InbounOrderProduct:
+        product = InbounOrderProduct(
+            inbound_order_id=order.id,
+            product_id=product_id,
+            qty=qty
+        )
+        db.session.add(product)
+        return product
 
 
 

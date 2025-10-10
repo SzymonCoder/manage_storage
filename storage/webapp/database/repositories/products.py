@@ -64,7 +64,7 @@ class ProductRepository(GenericRepository[Product]):
 
 # ------------------------ Filtrowanie ------------------------
 
-    def get_by_sku(self, sku: int) -> Product | None:
+    def get_by_sku(self, sku: str) -> Product | None:
         stmt = select(Product).where(Product.sku == sku)
         return db.session.scalar(stmt)
 
