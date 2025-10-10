@@ -53,7 +53,7 @@ class ExternalStockRepository:
 
         # Walidacja i transformacja wyników do listy naszych standardowych DTO
         # Pydantic automatycznie użyje aliasów zdefiniowanych w DTO!
-        return [ExternalStockDTO.model_validate(row) for row in stock_data_rows]
+        return [ExternalStockDTO.model_validate(dict(row)) for row in stock_data_rows]
 
 
 

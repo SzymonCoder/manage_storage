@@ -45,5 +45,5 @@ class Product(db.Model):# type: ignore
     inbound_orders: Mapped['InboundOrder'] = relationship(back_populates='product')
 
     products_suppliers_info: Mapped[list['ProductSupplierInfo']] = relationship(
-        back_populates="product")
+        back_populates="product", cascade="all, delete-orphan")
 

@@ -9,6 +9,7 @@ class StockQtyStatus(PyEnum):
     GOOD = 'good_qty'
     MEDIUM = 'medium_qty'
     CRITICAL = 'critical_qty'
+    TOO_LOW = 'too_low_qty'
     EMPTY = 'no_products'
 
 class ExpDateStatus(PyEnum):

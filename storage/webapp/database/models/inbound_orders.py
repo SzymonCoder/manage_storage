@@ -23,6 +23,7 @@ class InboundOrder(db.Model): # type: ignore
     __tablename__ = "inbound_orders"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    warehouse_id: Mapped[int] = mapped_column(ForeignKey('warehouses.id'), nullable=False)
     supplier_id: Mapped[int] = mapped_column(ForeignKey('suppliers.id'), nullable=False)
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id'), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)

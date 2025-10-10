@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from ...extensions import db
 from ..models.inbound_orders import InboundOrder, InboundOrderStatus
 from .generic import GenericRepository
@@ -31,3 +31,30 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
     def get_by_sku(self, sku: str) -> list[InboundOrder] | None:
         stmt = select(InboundOrder).where(InboundOrder.sku.is_(sku))
         return list(db.session.scalars(stmt))
+
+    def get_qty_by_active_orders_by_sku(self, sku: str, warehouse_id: int) -> int | None:
+        product_id = self.get_by_sku(sku)[0].product_id
+        active_orders = self.get_active_ordered_quantities(warehouse_id)
+        return active_orders.get(product_id)
+
+    def get_active_ordered_quantities(self, warehouse_id: int) -> dict:
+        active_statuses = [
+            status for status in InboundOrderStatus
+            if status not in (InboundOrderStatus.CANCELLED, InboundOrderStatus.COMPLETED)
+        ]
+
+        stmt = (
+            select(
+                InboundOrder.product_id,
+                func.sum(InboundOrder.quantity).label("total_ordered")
+            )
+            .where(
+                InboundOrder.warehouse_id == warehouse_id,
+                InboundOrder.status.in_(active_statuses)
+            )
+            .group_by(InboundOrder.product_id)
+        )
+
+        result = db.session.execute(stmt)
+
+        return {row.product_id: row.total_ordered for row in result}

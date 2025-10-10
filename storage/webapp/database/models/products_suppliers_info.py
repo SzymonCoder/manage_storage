@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .products import Product
     from .suppliers import Supplier
+    from .stocks_summary import StockSummary
 
 
 #jest to sprawdzenie statyczny przez mypy wiec db.Model laczy sie w Alchemy i mypy tego nie ogarnia

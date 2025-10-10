@@ -41,6 +41,11 @@ class StockSummaryRepository(GenericRepository[StockSummary]):
         return list(db.session.scalar(stmt))
 
 
+    def get_by_warehouse_id_and_sku(self, warehouse_id: int, sku: str) -> StockSummary | None:
+        stmt = select(StockSummary).where(StockSummary.warehouse_id.is_(warehouse_id)).where(StockSummary.sku.is_(sku))
+        return db.session.scalar(stmt)
+
+
     def transfer_to_archive(self, warehouse_id: int) -> None:
         stmt = select(StockSummary).where(StockSummary.warehouse_id.is_(warehouse_id))
         data_to_archive: list[StockSummary] = list(db.session.scalars(stmt))

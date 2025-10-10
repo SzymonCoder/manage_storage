@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-from sqlalchemy import Integer, DateTime, func, ForeignKey, Enum
+from sqlalchemy import Integer, DateTime, func, ForeignKey, Enum, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ...extensions import db
@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .warehouses import Warehouse
+    from .products import Product
 
 
 
@@ -49,3 +50,4 @@ class StockSummary(db.Model): # type: ignore
     )
 
     warehouse: Mapped['Warehouse'] = relationship(back_populates='stocks_summary')
+    product: Mapped['Product'] = relationship(back_populates='stocks_summary')
