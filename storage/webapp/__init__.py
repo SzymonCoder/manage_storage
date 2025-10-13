@@ -1,10 +1,11 @@
 from flask import Flask, current_app
 
 from . import database
+from .api import api_bp
 from .settings import config
 from .core.error_handlers import register_error_handlers
 from .extensions import db, migrate
-# from container import Container
+from .containers import Container
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -13,18 +14,18 @@ def create_app() -> Flask:
     # # Inicjalizacja kontenera DI
 
 
-    # #container = Container()
-    # # To wdraza ustawienia z wiring_config w Container
-    # #container.wire()
+    container = Container()
+    # To wdraza ustawienia z wiring_config w Container
+    container.wire()
     #
-    # # Mozesz w razie czego potem w dowolnym miejscu do tego kontenera sie odwolac (np. w testach)
-    # # app.container = container
+    # Mozesz w razie czego potem w dowolnym miejscu do tego kontenera sie odwolac (np. w testach)
+    # app.container = container
     #
     app.config.from_object(config['default'])
     config['default'].init_app(app)
     #
     register_error_handlers(app)
-    # #app.register_blueprint(api_bp)
+    app.register_blueprint(api_bp)
     #
     db.init_app(app)
     migrate.init_app(app, db)

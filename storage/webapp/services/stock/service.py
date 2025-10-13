@@ -64,7 +64,7 @@ class StockService:
         with db.session.begin():
             external_stock = self.prepare_data_for_stock_update(warehouse_id)
             if not external_stock:
-                raise ServiceException('Problem with import stock and convert data')
+                raise ServiceException('Problem with import stock_summary and convert data')
 
             self.stocks_summary_repo.transfer_to_archive(warehouse_id)
             self.stocks_with_exp_dates_repo.transfer_to_archive(warehouse_id)

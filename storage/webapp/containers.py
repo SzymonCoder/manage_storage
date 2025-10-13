@@ -1,7 +1,14 @@
 # plik z kontenerem dla repozytorium czy innych serwis tak by jeden kontenr byl odpalany w ramach jednej aplikacji
 from dependency_injector import containers, providers
 
-from database.repositories.external_stock_repository import ExternalStockRepository
+from .database.repositories.external_stock_repository import ExternalStockRepository
+# Replace this:
+# from ....webapp.services.stock.dtos import ExternalStockDTO
+
+# With this absolute import:
+from ..webapp.services.stock.dtos import ExternalStockDTO
+
+# ... existing code ...database.repositories.external_stock_repository import ExternalStockRepository
 from database.repositories.inbound_orders import InboundOrderRepository
 from database.repositories.products import ProductRepository
 from database.repositories.products_suppliers_info import ProductSupplierInfoRepository
@@ -12,7 +19,6 @@ from database.repositories.stocks_with_exp_dates import StocksWithExpDateReposit
 from database.repositories.suppliers import SupplierRepository
 from database.repositories.warehouses import WarehouseRepository
 from services.deliveries.services import InboundOrderService
-from services.stock.mappers import StockMapper
 from services.stock.service import StockService
 
 
@@ -25,7 +31,7 @@ class Container(containers.DeclarativeContainer):
     # Dzieki temu w tych miejscach uzyjesz @inject, Provide[...]
     wiring_config = containers.WiringConfiguration(
         packages=[
-            "webapp.api" #zastanwoci sie czy nie podizelic Container na ContainerInboundOrder i Stock i zrobic dwa i podzielic w api na dwie paczki
+            "webapp.api.stock_summary" #zastanwoci sie czy nie podizelic Container na ContainerInboundOrder i Stock i zrobic dwa i podzielic w api na dwie paczki
         ]
     )
 
@@ -49,7 +55,6 @@ class Container(containers.DeclarativeContainer):
 
     external_stock_repository = providers.Singleton(ExternalStockRepository)
 
-    stock_mapper = providers.Factory(StockMapper)
 
     deliveries_service = providers.Singleton(
         InboundOrderService,

@@ -25,7 +25,7 @@ from ....webapp.services.extension import (
     ValidationException,
 )
 
-from ..stock.serivce import StockService
+from ..stock.service import StockService
 
 from .mappers import inbound_order_to_dto
 

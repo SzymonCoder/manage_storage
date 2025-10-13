@@ -24,6 +24,14 @@ class StockSummaryRepository(GenericRepository[StockSummary]):
 
 # ------------------------ Filtry ------------------------
 
+    def get_all(self) -> list[StockSummary] | None:
+        stmt = select(StockSummary)
+        result = list(db.session.scalars(stmt))
+        print(f"Fetched stocks: {result}")
+        return result
+
+        # return list(db.session.scalars(stmt))
+
     def get_by_sku(self, sku: str) -> list[StockSummary] | None:
         stmt = select(StockSummary).where(StockSummary.sku.is_(sku))
         return list(db.session.scalar(stmt))
@@ -32,9 +40,12 @@ class StockSummaryRepository(GenericRepository[StockSummary]):
         stmt = select(StockSummary).where(StockSummary.expired_qty.isnot(None))
         return list(db.session.scalar(stmt))
 
-    def get_by_qty_status(self, status: StockSummary.status_of_total_qty) -> list[StockSummary] | None:
-        stmt = select(StockSummary).where(StockSummary.status_of_total_qty.is_(status))
-        return list(db.session.scalar(stmt))
+    def get_by_qty_status(self, status: StockSummary.status_of_total_qty, warehouse_id: int | None) -> list[StockSummary] | None:
+        if not warehouse_id:
+            stmt = select(StockSummary).where(StockSummary.status_of_total_qty.is_(status))
+        else:
+            stmt = select(StockSummary).where(StockSummary.warehouse_id.is_(warehouse_id)).where(StockSummary.status_of_total_qty.is_(status))
+        return list(db.session.scalars(stmt))
 
     def get_by_warehouse_id(self, warehouse_id: int) -> list[StockSummary] | None:
         stmt = select(StockSummary).where(StockSummary.warehouse_id.is_(warehouse_id))
