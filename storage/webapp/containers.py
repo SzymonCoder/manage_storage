@@ -11,7 +11,7 @@ from database.repositories.stock_with_exp_dates_arch import StockWithExpDateArch
 from database.repositories.stocks_with_exp_dates import StocksWithExpDateRepository
 from database.repositories.suppliers import SupplierRepository
 from database.repositories.warehouses import WarehouseRepository
-from services.deliveries.services import DeliveryService
+from services.deliveries.services import InboundOrderService
 from services.stock.mappers import StockMapper
 from services.stock.service import StockService
 
@@ -52,7 +52,7 @@ class Container(containers.DeclarativeContainer):
     stock_mapper = providers.Factory(StockMapper)
 
     deliveries_service = providers.Singleton(
-        DeliveryService,
+        InboundOrderService,
         supplier_repository=supplier_repository,
         product_supplier_info_repository=product_supplier_info_repository,
         inbound_order_repository=inbound_order_repository,

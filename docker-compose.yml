@@ -6,15 +6,22 @@ services:
   storage-webapp:
     restart: always
     build:
-      context: ./storage
+      context: ./storage #musi prowadzic do folderu z Dockerfile
       dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "5050:5000"
     volumes:
       - ./storage:/app
+    environment:
+      - PYTHONPATH=/app     # PYTHONPATH=/app`: Ustawia zmienną `PYTHONPATH`. Mówi ona Pythonowi:
+                            # "Oprócz standardowych miejsc, przeszukaj również katalog `/app`
     depends_on:
       mysql:
         condition: service_healthy
     networks:
-      - storage_network
+      - storage-network
 
 #  # --------------------------------------------------------------------------------------------------------------------
 #  # APLIKACJA WEBOWA USERS
@@ -86,11 +93,11 @@ services:
       timeout: 5s
       retries: 20
     networks:
-      - storage_network
+      - storage-network
 
 
 networks:
-  storage_network:
+  storage-network:
 
 volumes:
   mysql:

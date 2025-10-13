@@ -48,10 +48,12 @@ class InboundOrder(db.Model): # type: ignore
     supplier: Mapped["Supplier"] = relationship(back_populates='inbound_orders')
     product: Mapped["Product"] = relationship(back_populates='inbound_orders')
 
+    inbound_order_products: Mapped['InboundOrderProduct'] = relationship(back_populates='inbound_order')
 
 
 
-class InbounOrderProduct(db.Model):
+
+class InboundOrderProduct(db.Model):
     __tablename__ = "inbound_order_products"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -69,3 +71,5 @@ class InbounOrderProduct(db.Model):
         server_default=func.now(),
         onupdate=func.now()
     )
+
+    inbound_order: Mapped['InboundOrder'] = relationship(back_populates = 'inbound_order_products')

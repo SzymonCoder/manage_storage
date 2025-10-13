@@ -77,11 +77,13 @@ class StockService:
 
     def update_stock_summary_inbound_order_qty(self, warehouse_id: int = 1) -> StockSummaryInboundUpdateDTO:
 
-        with db.session.begin():
-            ordered_qty_in = self.inbound_orders_repo.get_active_ordered_quantities(warehouse_id)
+        ordered_qty_in = self.inbound_orders_repo.get_active_ordered_quantities(warehouse_id)
 
-            updated_sku_count = 0
-            updated_qty_count = 0
+        updated_sku_count = 0
+        updated_qty_count = 0
+
+        with db.session.begin():
+
 
             for product_id, value in ordered_qty_in.items():
                 stock_record = self.stocks_summary_repo.get_by_warehouse_id_and_sku(warehouse_id, product_id)

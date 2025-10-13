@@ -3,7 +3,7 @@ from decimal import Decimal
 from sqlalchemy import String, Boolean, DateTime, Integer, func, Numeric, CheckConstraint, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, foreign
 from ...extensions import db
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 # Ten blok jest widoczny tylko dla edytora kodu, a nie dla Pythona podczas uruchamiania.
 # Dzięki niemu edytor wie, czym jest 'ProductSupplierInfo'.

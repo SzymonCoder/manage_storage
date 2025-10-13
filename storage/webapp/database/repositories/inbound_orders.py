@@ -1,6 +1,6 @@
 from sqlalchemy import select, func
 from ...extensions import db
-from ..models.inbound_orders import InboundOrder, InboundOrderStatus, InbounOrderProduct
+from ..models.inbound_orders import InboundOrder, InboundOrderStatus, InboundOrderProduct
 from .generic import GenericRepository
 
 
@@ -21,8 +21,8 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
         order.product_id = product_id
 
 
-    def add_product_to_inbound_order(self, order: InboundOrder, product_id: int, qty: int) -> InbounOrderProduct:
-        product = InbounOrderProduct(
+    def add_product_to_inbound_order(self, order: InboundOrder, product_id: int, qty: int) -> InboundOrderProduct:
+        product = InboundOrderProduct(
             inbound_order_id=order.id,
             product_id=product_id,
             qty=qty
@@ -50,7 +50,7 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
     def get_active_ordered_quantities(self, warehouse_id: int) -> dict:
         active_statuses = [
             status for status in InboundOrderStatus
-            if status not in (InboundOrderStatus.CANCELLED, InboundOrderStatus.COMPLETED)
+            if status not in (InboundOrderStatus.CANCELLED, InboundOrderStatus.COMPLETED, InboundOrderStatus.CREATED)
         ]
 
         stmt = (
