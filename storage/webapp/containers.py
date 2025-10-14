@@ -73,5 +73,4 @@ class Container(containers.DeclarativeContainer):
         stock_with_exp_dates_arch_repo=stock_with_exp_dates_arch_repository,
         product_supplier_info_repo=product_supplier_info_repository,
         external_stock_repo=external_stock_repository,
-        stock_mapper=stock_mapper,
     )

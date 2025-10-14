@@ -29,6 +29,8 @@ class ReadInboundOrderDTO:
     inbound_order_id: int
     warehouse_id: int
     supplier_id: int
+    products: list["ReadInboundOrderProductDTO"]
+    status: Literal["approved", "produced", "in_transit", "delivered", "completed", "cancelled"]
 
 
 @dataclass(frozen=True)
@@ -59,3 +61,13 @@ class DeleteInboundOrderDTO:
 class DeleteInboundOrderProductDTO:
     inbound_order_id: int
     product_sku: str
+
+@dataclass(frozen=True)
+class ReadInboundOrderProductsWithOrderDTO:
+    inbound_order_product_id: int
+    inbound_order_id: int
+    product_id: int
+    product_qty: int
+    supplier_name: str
+    status: str
+    warehouse_id: int

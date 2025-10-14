@@ -27,19 +27,19 @@ from ....webapp.services.extension import (
 
 from ..stock.service import StockService
 
-from .mappers import inbound_order_to_dto
+from .mappers import inbound_order_to_dto, inbound_orders_with_products_to_dto
 
 
 from storage.webapp.services.deliveries.dtos import (
     CreateInboundOrderDTO,
-    UpdateQtySkuInboundOrderDTO,
     ReadInboundOrderDTO,
     AddProductToInboundOrderDTO,
     CreateOrderProductDTO,
     SetInboundOrderStatusDTO,
     UpdateQtySkuInboundOrderDTO,
     DeleteInboundOrderDTO,
-    DeleteInboundOrderProductDTO
+    DeleteInboundOrderProductDTO,
+    ReadInboundOrderProductsWithOrderDTO
 
 )
 
@@ -97,7 +97,6 @@ class InboundOrderService:
         return inbound_order_to_dto(inbound_order)
 
 
-#TODO : dokonczyc robienie dodawnai produktu do order po weryfikacji czy produkt jest aktywny.
     def add_product_to_inbound_order(self, dto: AddProductToInboundOrderDTO) -> ReadInboundOrderDTO:
 
         with db.session.begin():
@@ -142,7 +141,7 @@ class InboundOrderService:
 
 
 
-    def delete_order(self, dto: DeleteInboundOrderDTO) -> None:
+    def delete_order(self, dto: DeleteInboundOrderDTO) -> None | int:
 
         with db.session.begin():
             order = self._ensure_order(dto.inbound_order_id)
@@ -156,7 +155,8 @@ class InboundOrderService:
 
 
 
-    def delete_product_in_order(self, dto: DeleteInboundOrderProductDTO) -> None:
+
+    def delete_product_in_order(self, dto: DeleteInboundOrderProductDTO) -> None | str:
 
         with db.session.begin():
             order = self._ensure_order(dto.inbound_order_id)
@@ -180,6 +180,20 @@ class InboundOrderService:
 
 
 
+
+    def get_all_orders_with_products(
+            self,
+            warehouse_id: int | None = None,
+            statuses: list[InboundOrderStatus] | None = None
+    ) -> list[ReadInboundOrderProductsWithOrderDTO]:
+        objects = self.inbound_orders_repo.get_inbound_orders_with_products(warehouse_id, statuses)
+        return inbound_orders_with_products_to_dto(objects)
+
+
+
+
+
+# ----------------------------------------- Metody pomocnicze -----------------------------------------
 
 
     # zawsze przy dodaniu albo aktualizacji zamowienie trzeba wykorzystac z StockService -> update_stock_summary_inbound_order_qty

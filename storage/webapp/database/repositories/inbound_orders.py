@@ -68,3 +68,62 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
         result = db.session.execute(stmt)
 
         return {row.product_id: row.total_ordered for row in result}
+
+
+    def get_inbound_orders_with_products(
+            self,
+            warehouse_id: int | None = None,
+            statuses: list[InboundOrderStatus] | None = None
+    ) -> list[dict]:
+        """
+        Zwraca listę produktów z zamówień przychodzących wraz z informacjami o zamówieniu.
+        Można filtrować po magazynie (warehouse_id) i statusie (pojedynczym lub wielu).
+
+        - Jeśli `warehouse_id` = None → zwraca wszystkie magazyny.
+        - Jeśli `statuses` = None → zwraca tylko aktywne (czyli wszystko oprócz CANCELLED i DRAFT).
+        """
+
+        # Domyślnie tylko aktywne zamówienia
+        active_statuses = [
+            status for status in InboundOrderStatus
+            if status not in (InboundOrderStatus.CANCELLED, InboundOrderStatus.CREATED)
+        ]
+
+        selected_statuses = statuses or active_statuses
+
+        stmt = (
+            select(
+                InboundOrderProduct.id.label("inbound_order_product_id"),
+                InboundOrderProduct.inbound_order_id,
+                InboundOrderProduct.product_id,
+                InboundOrderProduct.qty.label("product_qty"),
+                InboundOrder.supplier_name,
+                InboundOrder.status,
+                InboundOrder.warehouse_id,
+                InboundOrder.created_at,
+            )
+            .join(InboundOrder, InboundOrder.id == InboundOrderProduct.inbound_order_id)
+            .where(InboundOrder.status.in_(selected_statuses))
+        )
+
+        # Opcjonalny filtr po magazynie
+        if warehouse_id is not None:
+            stmt = stmt.where(InboundOrder.warehouse_id == warehouse_id)
+
+        stmt = stmt.order_by(InboundOrder.id)
+
+        result = db.session.execute(stmt)
+
+        return [
+            {
+                "inbound_order_product_id": row.inbound_order_product_id,
+                "inbound_order_id": row.inbound_order_id,
+                "product_id": row.product_id,
+                "product_qty": row.product_qty,
+                "supplier_name": row.supplier_name,
+                "status": row.status,
+                "warehouse_id": row.warehouse_id,
+                "created_at": row.created_at,
+            }
+            for row in result
+        ]

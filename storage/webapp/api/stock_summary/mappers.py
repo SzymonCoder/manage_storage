@@ -1,5 +1,12 @@
-from ....webapp.api.stock_summary.schemas import StockResponseSchema
-from ....webapp.services.stock.dtos import StockSummaryDTO
+from ...database.models.stocks_summary import StockSummary
+from ....webapp.api.stock_summary.schemas import (
+    StockResponseSchema,
+    StockUpdateResponseSchema,
+    StockUpdateResponseSchema,
+    StockUpdateInboundQtyResponseSchema
+)
+from ....webapp.services.stock.dtos import StockSummaryDTO, StockSummaryInboundUpdateDTO
+
 
 
 
@@ -27,3 +34,18 @@ def to_schema_read_summary_stock(stocks_dto: list[StockSummaryDTO]) -> list[Stoc
         )
 
     return response_stock
+
+
+
+def to_schema_stock_update_response(stock: list[StockSummary]) -> StockUpdateResponseSchema:
+    return StockUpdateResponseSchema(
+        warehouse_id=stock[0].warehouse_id,
+        rows_number=len(stock)
+    )
+
+def to_schema_dto_inb_qty_update(dto: StockSummaryInboundUpdateDTO) -> StockUpdateInboundQtyResponseSchema:
+    return StockUpdateInboundQtyResponseSchema(
+        warehouse_id=dto.warehouse_id,
+        updated_sku_qty=dto.updated_sku_qty,
+        updated_qty=dto.updated_qty
+    )

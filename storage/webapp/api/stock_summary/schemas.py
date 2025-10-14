@@ -1,6 +1,4 @@
-from typing import Literal, Annotated
-from decimal import Decimal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from datetime import datetime
 
 
@@ -8,7 +6,7 @@ from datetime import datetime
 
 
 
-
+# ------------------------------------------ Response Schema ------------------------------------------
 
 class StockResponseSchema(BaseModel):
     warehouse_id: int
@@ -21,3 +19,14 @@ class StockResponseSchema(BaseModel):
     ordered_in_qty: int
     status_of_total_qty: str
     created_at: datetime
+
+
+class StockUpdateResponseSchema(BaseModel):
+    warehouse_id: int
+    rows_number: int
+
+
+class StockUpdateInboundQtyResponseSchema(BaseModel):
+    warehouse_id: int
+    updated_sku_qty: int
+    updated_qty: int
