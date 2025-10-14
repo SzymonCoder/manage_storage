@@ -53,3 +53,5 @@ class ReadInboundOrderProductsWithOrderSchema(BaseModel):
     product_qty: int
     supplier_name: str
     status: str
+
+

@@ -10,13 +10,6 @@ class StocksWithExpDateRepository(GenericRepository[StockWithExpDate]):
         super().__init__(StockWithExpDate)
         self.arch_repo = arch_repo
 
-# ------------------------ Aktualizacje statusow i opisu ------------------------
-
-    def set_exp_date_status(self, status: StockWithExpDate.status_of_exp_date) -> None:
-        self.model.status_of_total_qty = status
-
-    def set_total_qty_status(self, status: StockWithExpDate.status_of_total_qty) -> None:
-        self.model.status_of_exp_date = status
 
 
 # ------------------------ Filtry ------------------------
@@ -67,7 +60,14 @@ class StocksWithExpDateRepository(GenericRepository[StockWithExpDate]):
 
 
 
-    # TODO: Repository stocks_with_exp_dates oraz stocks_summary maja kilka podobnych filtrów, więc warto
     # TODO: pochylić się nad tym i zrobic klasę abstrakcyjną, po ktorej będa również dziedziczyć tak by
     # TODO: uniknąć DRY
 
+
+# ------------------------ Aktualizacje statusow i opisu ------------------------
+
+    def _set_exp_date_status(self, status: StockWithExpDate.status_of_exp_date) -> None:
+        self.model.status_of_total_qty = status
+
+    def _set_total_qty_status(self, status: StockWithExpDate.status_of_total_qty) -> None:
+        self.model.status_of_exp_date = status

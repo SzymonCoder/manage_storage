@@ -38,16 +38,15 @@ def update_stocks_inbound_qty(stock_service: StockService = Provide[Container.st
 @inject
 def get_all_summary_stock(stock_service: StockService = Provide[Container.stock_service]) -> ResponseReturnValue:
     stock_action = stock_service.stocks_summary_repo.get_all()
-    response_stock = to_schema_read_summary_stock(stock_action)
-    return jsonify([schema.model_dump(mode='json') for schema in response_stock]), 200
+    return jsonify([to_schema_read_summary_stock(dto).model_dump(mode='json') for dto in stock_action]), 200
 
 
 @stock_summary_bp.get("/<int:warehouse_id>")
 @inject
 def get_summary_stock_by_wh_id(warehouse_id: int, stock_service: StockService = Provide[Container.stock_service]) -> ResponseReturnValue:
-    stock_dto = stock_service.stocks_summary_repo.get_by_warehouse_id(warehouse_id)
-    response_stock = to_schema_read_summary_stock(stock_dto)
-    return jsonify([schema.model_dump(mode='json') for schema in response_stock]), 200
+    stock_action = stock_service.stocks_summary_repo.get_by_warehouse_id(warehouse_id)
+    return jsonify([to_schema_read_summary_stock(dto).model_dump(mode='json') for dto in stock_action]), 200
+
 
 
 

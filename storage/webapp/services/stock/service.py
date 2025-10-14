@@ -29,10 +29,10 @@ from ....webapp.services.extension import (
 
 )
 
-from ...services.stock.dtos import ExternalStockDTO, StockSummaryInboundUpdateDTO
+from ...services.stock.dtos import ExternalStockDTO, StockSummaryInboundUpdateDTO, ReadStockExpDateDTO
 
 
-
+from .mapper import to_dto_read_stock_with_exp_date
 
 
 class StockService:
@@ -98,8 +98,16 @@ class StockService:
         print(f'Stock summary updated with inbound orders')
         return stock_summary_inbound_update_to_dto(warehouse_id, updated_sku_count, updated_qty_count)
 
+# ------------------------------------ Filtry ----------------------------------
+
+def get_all_stock(self) -> list[ReadStockExpDateDTO]:
+    result = list(self.stocks_with_exp_date_repo.get_all())
+    return [to_dto_read_stock_with_exp_date(r) for r in result]
 
 
+def get_stock_by_warehouse_id(self, warehouse_id: int) -> list[ReadStockExpDateDTO]:
+    result = list(self.stocks_with_exp_date_repo.get_all_by_warehouse_id(warehouse_id))
+    return [to_dto_read_stock_with_exp_date(r) for r in result]
 
 
 # ------------------------------------ Funkcje do przygotowania aktualizacji stocku ----------------------------------
