@@ -109,6 +109,15 @@ def get_stock_by_warehouse_id(self, warehouse_id: int) -> list[ReadStockExpDateD
     result = list(self.stocks_with_exp_date_repo.get_all_by_warehouse_id(warehouse_id))
     return [to_dto_read_stock_with_exp_date(r) for r in result]
 
+def get_stock_with_status(self, status: str) -> list[ReadStockExpDateDTO]:
+    result = list(self.stocks_with_exp_date_repo.get_all_by_status(status))
+    return [to_dto_read_stock_with_exp_date(r) for r in result]
+
+def get_stock_with_sku(self, sku: str) -> list[ReadStockExpDateDTO]:
+    result = list(self.stocks_with_exp_date_repo.get_by_sku(sku))
+    return [to_dto_read_stock_with_exp_date(r) for r in result]
+
+
 
 # ------------------------------------ Funkcje do przygotowania aktualizacji stocku ----------------------------------
     def prepare_data_for_stock_update(self, warehouse_id: int = 1):

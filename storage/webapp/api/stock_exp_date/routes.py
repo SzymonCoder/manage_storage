@@ -8,7 +8,7 @@ from ....webapp.containers import Container
 from . import stock_exp_date_bp
 
 
-from .mappers import to_schema_read_stock_with_exp_date
+from .mappers import to_schema_dto_read_stock_with_exp_date
 
 
 # ----------------------------------------- Filters -----------------------------------------
@@ -20,7 +20,7 @@ def get_all_stock_with_exp_date(
     ) -> ResponseReturnValue:
 
     stock_action = stock_service.get_all_stock()
-    return jsonify([to_schema_read_stock_with_exp_date(stock).model_dump(mode='json') for stock in stock_action]), 200
+    return jsonify([to_schema_dto_read_stock_with_exp_date(stock).model_dump(mode='json') for stock in stock_action]), 200
 
 
 @stock_exp_date_bp.get("/<int:warehouse_id>")
@@ -29,5 +29,27 @@ def get_all_stock_with_exp_date_by_warehouse_id(
         warehouse_id: int,
         stock_service: StockWithExpDate = Provide[Container.stock_service]
     ) -> ResponseReturnValue:
+
     stock_action = stock_service.get_all_by_warehouse_id(warehouse_id)
-    return jsonify([to_schema_read_stock_with_exp_date(stock).model_dump(mode='json') for stock in stock_action]), 200
+    return jsonify([to_schema_dto_read_stock_with_exp_date(stock).model_dump(mode='json') for stock in stock_action]), 200
+
+
+@stock_exp_date_bp.get("/<string:qty_status>")
+@inject
+def get_stock_by_qty_status(
+        qty_status: str,
+        stock_service: StockWithExpDate = Provide[Container.stock_service]
+    ) -> ResponseReturnValue:
+
+    stock_action = stock_service.get_stock_with_status(qty_status)
+    return jsonify([to_schema_dto_read_stock_with_exp_date(stock).model_dump(mode='json') for stock in stock_action]), 200
+
+@stock_exp_date_bp.get("/<string:sku>")
+@inject
+def get_stock_by_sku(
+        sku: str,
+        stock_service: StockWithExpDate = Provide[Container.stock_Service]
+    ) -> ResponseReturnValue:
+
+    stock_action = stock_service.get_stock_by_sku(sku)
+    return jsonify([to_schema_dto_read_stock_with_exp_date(stock).model_dump(mode='json') for stock in stock_action]), 200
