@@ -1,7 +1,7 @@
 from ..stock_exp_date.schemas import ReadStockExpDateSchema
 
 
-from ....webapp.services.stock.dtos import ReadStockExpDateDTO
+from webapp.services.stock.dtos import ReadStockExpDateDTO
 
 
 

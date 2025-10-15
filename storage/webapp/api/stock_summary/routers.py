@@ -5,14 +5,14 @@ from dependency_injector.wiring import inject, Provide
 from .mappers import to_schema_read_summary_stock, to_schema_stock_update_response, to_schema_dto_inb_qty_update
 from ...database.models.stocks_summary import StockSummary
 from ...database.models.stocks_with_exp_dates import StockWithExpDate
-from ....webapp.api.stock_summary.schemas import StockResponseSchema, StockUpdateResponseSchema
+from webapp.api.stock_summary.schemas import StockResponseSchema, StockUpdateResponseSchema
 
 
 
-from ....webapp.services.stock.service import StockService
+from webapp.services.stock.service import StockService
 
 
-from ....webapp.containers import Container
+from webapp.containers import Container
 from . import stock_summary_bp
 
 
@@ -63,7 +63,7 @@ def get_summary_stock_by_wh_id_and_sku(
     return jsonify([schema.model_dump(mode='json') for schema in response_stock]), 200
 
 
-@stock_summary_bp.get("<str:status_of_total_qty>/<int:warehouse_id>")
+@stock_summary_bp.get("<string:status_of_total_qty>/<int:warehouse_id>")
 @inject
 def get_summary_stock_by_status_of_total_qty(
         warehouse_id: int | None,

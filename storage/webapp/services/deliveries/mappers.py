@@ -1,5 +1,5 @@
 from .dtos import ReadInboundOrderDTO, ReadInboundOrderProductsWithOrderDTO
-from ....webapp.database.models.inbound_orders import InboundOrder
+from webapp.database.models.inbound_orders import InboundOrder
 
 
 

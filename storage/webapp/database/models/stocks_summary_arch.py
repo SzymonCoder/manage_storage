@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class StockSummaryArch(db.Model): # type: ignore
-    __tablename__ = "stocks_summary"
+    __tablename__ = "stocks_summary_arch"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     warehouse_id: Mapped[int] = mapped_column(ForeignKey('warehouses.id'))

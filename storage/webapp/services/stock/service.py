@@ -3,26 +3,26 @@ from datetime import datetime, timedelta
 
 from .mapper import stock_to_dto, stock_summary_inbound_update_to_dto
 from ...database.repositories.products import ProductRepository
-from ....webapp.database.models.inbound_orders import InboundOrder
-from ....webapp.database.models.stocks_summary import StockSummary
-from ....webapp.database.models.stocks_with_exp_dates import StockWithExpDate, ExpDateStatus, StockQtyStatus
-from ....webapp.database.models.stocks_summary_arch import StockSummaryArch
-from ....webapp.database.models.stocks_with_exp_dates_arch import  StockWithExpDateArch
-from ....webapp.database.models.products_suppliers_info import ProductSupplierInfo
+from webapp.database.models.inbound_orders import InboundOrder
+from webapp.database.models.stocks_summary import StockSummary
+from webapp.database.models.stocks_with_exp_dates import StockWithExpDate, ExpDateStatus, StockQtyStatus
+from webapp.database.models.stocks_summary_arch import StockSummaryArch
+from webapp.database.models.stocks_with_exp_dates_arch import  StockWithExpDateArch
+from webapp.database.models.products_suppliers_info import ProductSupplierInfo
 
 
-from ....webapp.database.repositories.inbound_orders import InboundOrderRepository
-from ....webapp.database.repositories.stocks_summary import StockSummaryRepository
-from ....webapp.database.repositories.stocks_with_exp_dates import StocksWithExpDateRepository
-from ....webapp.database.repositories.stock_summary_arch import StockSummaryArchRepository
-from ....webapp.database.repositories.stock_with_exp_dates_arch import StockWithExpDateArchRepository
-from ....webapp.database.repositories.products_suppliers_info import ProductSupplierInfoRepository
-from ....webapp.database.repositories.external_stock_repository import ExternalStockRepository
+from webapp.database.repositories.inbound_orders import InboundOrderRepository
+from webapp.database.repositories.stocks_summary import StockSummaryRepository
+from webapp.database.repositories.stocks_with_exp_dates import StocksWithExpDateRepository
+from webapp.database.repositories.stock_summary_arch import StockSummaryArchRepository
+from webapp.database.repositories.stock_with_exp_dates_arch import StockWithExpDateArchRepository
+from webapp.database.repositories.products_suppliers_info import ProductSupplierInfoRepository
+from webapp.database.repositories.external_stock_repository import ExternalStockRepository
 
 
-from ....webapp.extensions import db
+from webapp.extensions import db
 
-from ....webapp.services.extension import (
+from webapp.services.extension import (
     ServiceException,
     NotFoundDataException,
     ValidationException,

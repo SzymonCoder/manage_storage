@@ -1,11 +1,11 @@
 from ...database.models.stocks_summary import StockSummary
-from ....webapp.api.stock_summary.schemas import (
+from webapp.api.stock_summary.schemas import (
     StockResponseSchema,
     StockUpdateResponseSchema,
     StockUpdateResponseSchema,
     StockUpdateInboundQtyResponseSchema
 )
-from ....webapp.services.stock.dtos import StockSummaryDTO, StockSummaryInboundUpdateDTO
+from webapp.services.stock.dtos import StockSummaryDTO, StockSummaryInboundUpdateDTO
 
 
 

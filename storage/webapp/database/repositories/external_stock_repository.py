@@ -2,7 +2,8 @@ from sqlalchemy import create_engine, text, Engine
 from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import List, Dict
-from ....webapp.services.stock.dtos import ExternalStockDTO
+from webapp.services.stock.dtos import ExternalStockDTO
+
 
 
 class ExternalStockRepository:

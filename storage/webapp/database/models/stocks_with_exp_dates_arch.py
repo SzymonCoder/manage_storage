@@ -22,7 +22,7 @@ class ExpDateStatus(PyEnum):
 
 
 class StockWithExpDateArch(db.Model): # type: ignore
-    __tablename__ = "stocks_with_exp_dates"
+    __tablename__ = "stocks_with_exp_dates_arch"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     warehouse_id: Mapped[int] = mapped_column(ForeignKey('warehouses.id'))

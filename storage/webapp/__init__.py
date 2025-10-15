@@ -37,7 +37,7 @@ def create_app() -> Flask:
 
         # Powoduje, że Python "odkrywa" wszystkie Twoje modele SQLAlchemy.
         # Jest to kluczowe, aby narzędzie do migracji (Flask-Migrate) wiedziało o tabelach, którymi ma zarządzać.
-        from .database import models
+        from webapp.database import models
 
         # Wypisuje do logów wartość klucza SECRET_KEY.
         # Służy to do sprawdzenia, czy konfiguracja została wczytana poprawnie.

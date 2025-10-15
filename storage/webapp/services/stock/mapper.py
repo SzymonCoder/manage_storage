@@ -1,6 +1,6 @@
 from .dtos import StockDTO, StockSummaryInboundUpdateDTO, ReadStockExpDateDTO
-from ....webapp.database.models.stocks_summary import StockSummary
-from ....webapp.database.models.stocks_with_exp_dates import StockWithExpDate
+from webapp.database.models.stocks_summary import StockSummary
+from webapp.database.models.stocks_with_exp_dates import StockWithExpDate
 
 
 def stock_to_dto(stock: list[StockSummary]) -> StockDTO:

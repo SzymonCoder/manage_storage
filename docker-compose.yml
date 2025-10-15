@@ -56,17 +56,17 @@ services:
 #  # --------------------------------------------------------------------------------------------------------------------
 #  # NGINX
 #  # --------------------------------------------------------------------------------------------------------------------
-#  nginx:
-#    restart: always
-#    image: nginx:latest
-#    volumes:
-#      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-#    ports:
-#      - "80:80"
-#    depends_on:
-#      - storage-webapp
-#    networks:
-#      - storage_network
+  nginx:
+    restart: always
+    image: nginx:latest
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - storage-webapp
+    networks:
+      - storage-network
 
   # --------------------------------------------------------------------------------------------------------------------
   # MYSQL

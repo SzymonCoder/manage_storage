@@ -7,19 +7,19 @@ from ...database.models.inbound_orders import InboundOrder, InboundOrderProduct,
 from ...database.models.products import Product
 
 
-from ....webapp.database.repositories.inbound_orders import InboundOrderRepository
-from ....webapp.database.repositories.stocks_summary import StockSummaryRepository
-from ....webapp.database.repositories.stocks_with_exp_dates import StocksWithExpDateRepository
-from ....webapp.database.repositories.stock_summary_arch import StockSummaryArchRepository
-from ....webapp.database.repositories.stock_with_exp_dates_arch import StockWithExpDateArchRepository
-from ....webapp.database.repositories.products_suppliers_info import ProductSupplierInfoRepository
-from ....webapp.database.repositories.external_stock_repository import ExternalStockRepository
-from ....webapp.database.repositories.products import ProductRepository
-from ....webapp.database.repositories.inbound_order_product import InboundOrderProductRepository
+from webapp.database.repositories.inbound_orders import InboundOrderRepository
+from webapp.database.repositories.stocks_summary import StockSummaryRepository
+from webapp.database.repositories.stocks_with_exp_dates import StocksWithExpDateRepository
+from webapp.database.repositories.stock_summary_arch import StockSummaryArchRepository
+from webapp.database.repositories.stock_with_exp_dates_arch import StockWithExpDateArchRepository
+from webapp.database.repositories.products_suppliers_info import ProductSupplierInfoRepository
+from webapp.database.repositories.external_stock_repository import ExternalStockRepository
+from webapp.database.repositories.products import ProductRepository
+from webapp.database.repositories.inbound_order_product import InboundOrderProductRepository
 
-from ....webapp.extensions import db
+from webapp.extensions import db
 
-from ....webapp.services.extension import (
+from webapp.services.extension import (
     ServiceException,
     NotFoundDataException,
     ValidationException,
@@ -30,7 +30,7 @@ from ..stock.service import StockService
 from .mappers import inbound_order_to_dto, inbound_orders_with_products_to_dto
 
 
-from storage.webapp.services.deliveries.dtos import (
+from webapp.services.deliveries.dtos import (
     CreateInboundOrderDTO,
     ReadInboundOrderDTO,
     AddProductToInboundOrderDTO,

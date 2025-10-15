@@ -44,7 +44,7 @@ class ReadInboundOrderProductDTO:
     inbound_order_id: int
     product_id_sku: int
     quantity: int
-    net_price: Decimal(10, 2)
+    net_price: Decimal
     currency: str
 
 

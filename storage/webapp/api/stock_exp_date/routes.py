@@ -2,9 +2,9 @@ from flask import request, jsonify
 from flask.typing import ResponseReturnValue
 from dependency_injector.wiring import inject, Provide
 
-from ....webapp.services.stock.service import StockWithExpDate
+from webapp.services.stock.service import StockWithExpDate
 
-from ....webapp.containers import Container
+from webapp.containers import Container
 from . import stock_exp_date_bp
 
 
@@ -48,7 +48,7 @@ def get_stock_by_qty_status(
 @inject
 def get_stock_by_sku(
         sku: str,
-        stock_service: StockWithExpDate = Provide[Container.stock_Service]
+        stock_service: StockWithExpDate = Provide[Container.stock_service]
     ) -> ResponseReturnValue:
 
     stock_action = stock_service.get_stock_by_sku(sku)
