@@ -1,8 +1,10 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, DateTime, Boolean, func, CheckConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from ...extensions import db
 from typing import TYPE_CHECKING
+
+from sqlalchemy import Integer, String, DateTime, Boolean, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from ...extensions import db
 
 if TYPE_CHECKING:
     from .stocks_summary import StockSummary
@@ -32,5 +34,5 @@ class Warehouse(db.Model):# type: ignore
         onupdate=func.now()
     )
 
-    stocks_summaries_warehouse: Mapped['StockSummary'] = relationship(back_populates='warehouse')
-    stocks_summary_arch: Mapped['StockSummaryArch'] = relationship(back_populates='warehouse')
+    stocks_summaries_warehouse: Mapped['StockSummary'] = relationship(back_populates='warehouses')
+    stocks_summary_arch: Mapped['StockSummaryArch'] = relationship(back_populates='warehouses')

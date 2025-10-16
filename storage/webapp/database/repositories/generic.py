@@ -1,8 +1,9 @@
-from typing import Iterable, Generic, TypeVar
-from sqlalchemy import select
+from typing import Iterable, TypeVar
+
 from flask_sqlalchemy.model import Model
+from sqlalchemy import select
+
 from ...extensions import db
-from abc import ABC
 
 T = TypeVar("T", bound=Model)
 

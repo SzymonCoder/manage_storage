@@ -1,11 +1,12 @@
+import os
 from logging.config import dictConfig
-from dotenv import load_dotenv
-from flask import Flask
 # urllib.parse to modul do pracy z URL-ami (parsowanie, skladanie, kodowanie).
 # quote_plus to funkcja kodowania ciagow znakow w taki sposob, zeby byly bezpieczne do uzycia w adresach URL
 # Nam sie przyda podczas budowania connection string-a
 from urllib.parse import quote_plus
-import os
+
+from dotenv import load_dotenv
+from flask import Flask
 
 load_dotenv()
 

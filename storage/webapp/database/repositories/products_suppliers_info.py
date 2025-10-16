@@ -1,8 +1,10 @@
-from sqlalchemy import select
-from ...extensions import db
-from ..models.products_suppliers_info import ProductSupplierInfo
-from .generic import GenericRepository
 from decimal import Decimal
+
+from sqlalchemy import select
+
+from .generic import GenericRepository
+from ..models.products_suppliers_info import ProductSupplierInfo
+from ...extensions import db
 
 
 class ProductSupplierInfoRepository(GenericRepository[ProductSupplierInfo]):

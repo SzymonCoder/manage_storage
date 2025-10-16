@@ -2,10 +2,11 @@ from flask import Flask, current_app
 
 from . import database
 from .api import api_bp
-from .settings import config
+from .containers import Container
 from .core.error_handlers import register_error_handlers
 from .extensions import db, migrate
-from .containers import Container
+from .settings import config
+
 
 def create_app() -> Flask:
     app = Flask(__name__)

@@ -1,9 +1,6 @@
-from sqlalchemy import select, func
-
-from ..models.products import Product
-from ..models.stocks_summary_arch import StockSummaryArch
-from ...extensions import db
 from .generic import GenericRepository
+from ..models.stocks_summary_arch import StockSummaryArch
+
 
 class StockSummaryArchRepository(GenericRepository[StockSummaryArch]):
     def __init__(self):

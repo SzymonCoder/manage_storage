@@ -1,29 +1,26 @@
 # plik z kontenerem dla repozytorium czy innych serwis tak by jeden kontenr byl odpalany w ramach jednej aplikacji
 from dependency_injector import containers, providers
-
-# Replace this:
-# from ....webapp.services.stock.dtos import ExternalStockDTO
-
-# With this absolute import:
-# from ..webapp.services.stock.dtos import ExternalStockDTO
-
 # ... existing code ...database.repositories.external_stock_repository import ExternalStockRepository
 from webapp.database.repositories.external_stock_repository import ExternalStockRepository
-from webapp.services.stock.dtos import ExternalStockDTO
-
+from webapp.database.repositories.inbound_order_product import InboundOrderProductRepository
 from webapp.database.repositories.inbound_orders import InboundOrderRepository
 from webapp.database.repositories.products import ProductRepository
 from webapp.database.repositories.products_suppliers_info import ProductSupplierInfoRepository
 from webapp.database.repositories.stock_summary_arch import StockSummaryArchRepository
-from webapp.database.repositories.stocks_summary import StockSummaryRepository
 from webapp.database.repositories.stock_with_exp_dates_arch import StockWithExpDateArchRepository
+from webapp.database.repositories.stocks_summary import StockSummaryRepository
 from webapp.database.repositories.stocks_with_exp_dates import StocksWithExpDateRepository
 from webapp.database.repositories.suppliers import SupplierRepository
 from webapp.database.repositories.warehouses import WarehouseRepository
 from webapp.services.deliveries.services import InboundOrderService
+from webapp.services.stock.dtos import ExternalStockDTO
 from webapp.services.stock.service import StockService
 
-from webapp.database.repositories.inbound_order_product import InboundOrderProductRepository
+
+# Replace this:
+# from ....webapp.services.stock.dtos import ExternalStockDTO
+# With this absolute import:
+# from ..webapp.services.stock.dtos import ExternalStockDTO
 
 
 # Klasa Container to kontener DI, dziedziczacy po DeclarativeContainer i bedzie

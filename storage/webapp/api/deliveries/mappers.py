@@ -4,7 +4,6 @@ from .schemas import (
     AddProductToInboundOrderSchema,
     SetInboundOrderStatusSchema,
     UpdateQtySkuInboundOrderSchema,
-    DeleteInboundOrderSchema, #tutaj wersja gdzie order id mam z URL
     DeleteInboundOrderProductSchema,
     ReadInboundOrderProductsWithOrderSchema
 

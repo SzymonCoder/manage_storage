@@ -1,8 +1,8 @@
 from sqlalchemy import select, update
+
 from .generic import GenericRepository
 from ..models.products import Product
 from ...extensions import db
-
 
 
 class ProductRepository(GenericRepository[Product]):

@@ -1,27 +1,20 @@
-from itertools import product, groupby
 from datetime import datetime, timedelta
+from itertools import groupby
 
-from .mapper import stock_to_dto, stock_summary_inbound_update_to_dto
-from ...database.repositories.products import ProductRepository
 from webapp.database.models.inbound_orders import InboundOrder
-from webapp.database.models.stocks_summary import StockSummary
-from webapp.database.models.stocks_with_exp_dates import StockWithExpDate, ExpDateStatus, StockQtyStatus
-from webapp.database.models.stocks_summary_arch import StockSummaryArch
-from webapp.database.models.stocks_with_exp_dates_arch import  StockWithExpDateArch
 from webapp.database.models.products_suppliers_info import ProductSupplierInfo
-
-
+from webapp.database.models.stocks_summary import StockSummary
+from webapp.database.models.stocks_summary_arch import StockSummaryArch
+from webapp.database.models.stocks_with_exp_dates import StockWithExpDate, ExpDateStatus, StockQtyStatus
+from webapp.database.models.stocks_with_exp_dates_arch import StockWithExpDateArch
+from webapp.database.repositories.external_stock_repository import ExternalStockRepository
 from webapp.database.repositories.inbound_orders import InboundOrderRepository
-from webapp.database.repositories.stocks_summary import StockSummaryRepository
-from webapp.database.repositories.stocks_with_exp_dates import StocksWithExpDateRepository
+from webapp.database.repositories.products_suppliers_info import ProductSupplierInfoRepository
 from webapp.database.repositories.stock_summary_arch import StockSummaryArchRepository
 from webapp.database.repositories.stock_with_exp_dates_arch import StockWithExpDateArchRepository
-from webapp.database.repositories.products_suppliers_info import ProductSupplierInfoRepository
-from webapp.database.repositories.external_stock_repository import ExternalStockRepository
-
-
+from webapp.database.repositories.stocks_summary import StockSummaryRepository
+from webapp.database.repositories.stocks_with_exp_dates import StocksWithExpDateRepository
 from webapp.extensions import db
-
 from webapp.services.extension import (
     ServiceException,
     NotFoundDataException,
@@ -29,9 +22,10 @@ from webapp.services.extension import (
 
 )
 
-from ...services.stock.dtos import ExternalStockDTO, StockSummaryInboundUpdateDTO, ReadStockExpDateDTO, StockSummaryDTO
-
+from .mapper import stock_to_dto, stock_summary_inbound_update_to_dto
 from .mapper import to_dto_read_stock_with_exp_date, to_dto_read_stock_summary
+from ...database.repositories.products import ProductRepository
+from ...services.stock.dtos import ExternalStockDTO, StockSummaryInboundUpdateDTO, ReadStockExpDateDTO, StockSummaryDTO
 
 
 class StockService:
@@ -164,7 +158,7 @@ class StockService:
         external_data_dtos = self.external_stock_repo.get_stock_data_from_warehouse(warehouse_id)
 
         if not external_data_dtos:
-            raise NotFoundDataException('No data from external warehouse')
+            raise NotFoundDataException('No data from external warehouses')
 
         # pogrupowanie danych po SKU
         dtos_by_sku = {k: list(v) for k, v in groupby(sorted(external_data_dtos, key=lambda d: d.sku), key=lambda d: d.sku)}

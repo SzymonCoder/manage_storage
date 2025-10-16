@@ -3,18 +3,13 @@ from flask.typing import ResponseReturnValue
 from dependency_injector.wiring import inject, Provide
 
 from .mappers import to_schema_read_summary_stock, to_schema_stock_update_response, to_schema_dto_inb_qty_update
-from ...database.models.stocks_summary import StockSummary
-from ...database.models.stocks_with_exp_dates import StockWithExpDate
 from webapp.api.stock_summary.schemas import StockResponseSchema, StockUpdateResponseSchema
-
 
 
 from webapp.services.stock.service import StockService
 
-
 from webapp.containers import Container
 from . import stock_summary_bp
-from ...services.stock.mapper import to_dto_read_stock_summary
 
 
 # ----------------------------------------- Update Stock -----------------------------------------

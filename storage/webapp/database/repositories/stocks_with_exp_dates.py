@@ -1,11 +1,11 @@
 from sqlalchemy import select, delete
 from sqlalchemy.orm import joinedload
 
+from .generic import GenericRepository
 from ..models.products import Product
-from ...extensions import db
 from ..models.stocks_with_exp_dates import StockWithExpDate, StockQtyStatus, ExpDateStatus
 from ..models.stocks_with_exp_dates_arch import StockWithExpDateArch
-from .generic import GenericRepository
+from ...extensions import db
 
 
 class StocksWithExpDateRepository(GenericRepository[StockWithExpDate]):

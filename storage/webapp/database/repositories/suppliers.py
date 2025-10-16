@@ -1,10 +1,11 @@
-from sqlalchemy import select
 from typing import Type
-from ...extensions import db
-from ..models.suppliers import Supplier
-from .generic import GenericRepository
-from flask_sqlalchemy.model import Model
 
+from flask_sqlalchemy.model import Model
+from sqlalchemy import select
+
+from .generic import GenericRepository
+from ..models.suppliers import Supplier
+from ...extensions import db
 
 
 class SupplierRepository(GenericRepository[Supplier]):

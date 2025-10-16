@@ -1,35 +1,16 @@
 #tutaj operacje usera co moze robic np. dodac produkt do bazy danych, albo admin usunac z bazy danych,
 # fajnie byloby jeszcze zrobic zamowienie z produktow, ktore maja krotka date waznosci albo sa na wyczerpaniu
 # stworzenie zamowienia i ustawianie statusow (nie ma wplywu na stan magazynowy
-from ...database.repositories.suppliers import SupplierRepository
-from ...database.repositories.warehouses import WarehouseRepository
-from ...database.models.inbound_orders import InboundOrder, InboundOrderProduct, InboundOrderStatus
-from ...database.models.products import Product
-
-
+from webapp.database.repositories.external_stock_repository import ExternalStockRepository
+from webapp.database.repositories.inbound_order_product import InboundOrderProductRepository
 from webapp.database.repositories.inbound_orders import InboundOrderRepository
-from webapp.database.repositories.stocks_summary import StockSummaryRepository
-from webapp.database.repositories.stocks_with_exp_dates import StocksWithExpDateRepository
+from webapp.database.repositories.products import ProductRepository
+from webapp.database.repositories.products_suppliers_info import ProductSupplierInfoRepository
 from webapp.database.repositories.stock_summary_arch import StockSummaryArchRepository
 from webapp.database.repositories.stock_with_exp_dates_arch import StockWithExpDateArchRepository
-from webapp.database.repositories.products_suppliers_info import ProductSupplierInfoRepository
-from webapp.database.repositories.external_stock_repository import ExternalStockRepository
-from webapp.database.repositories.products import ProductRepository
-from webapp.database.repositories.inbound_order_product import InboundOrderProductRepository
-
+from webapp.database.repositories.stocks_summary import StockSummaryRepository
+from webapp.database.repositories.stocks_with_exp_dates import StocksWithExpDateRepository
 from webapp.extensions import db
-
-from webapp.services.extension import (
-    ServiceException,
-    NotFoundDataException,
-    ValidationException,
-)
-
-from ..stock.service import StockService
-
-from .mappers import inbound_order_to_dto, inbound_orders_with_products_to_dto
-
-
 from webapp.services.deliveries.dtos import (
     CreateInboundOrderDTO,
     ReadInboundOrderDTO,
@@ -42,8 +23,18 @@ from webapp.services.deliveries.dtos import (
     ReadInboundOrderProductsWithOrderDTO
 
 )
+from webapp.services.extension import (
+    ServiceException,
+    NotFoundDataException,
+    ValidationException,
+)
 
-from typing import cast
+from .mappers import inbound_order_to_dto, inbound_orders_with_products_to_dto
+from ..stock.service import StockService
+from ...database.models.inbound_orders import InboundOrder, InboundOrderProduct, InboundOrderStatus
+from ...database.models.products import Product
+from ...database.repositories.suppliers import SupplierRepository
+from ...database.repositories.warehouses import WarehouseRepository
 
 
 class InboundOrderService:
@@ -211,7 +202,7 @@ class InboundOrderService:
         supplier = self.supplier_repo.get_by_id(supplier_id)
         status = supplier and supplier.is_acctive
 
-        # jesli nie ma supplier = False, jesli jest to idzie dale
+        # jesli nie ma suppliers = False, jesli jest to idzie dale
         # i sprawdza is_active, jesli is_active = Fasle, to Fasle, jesli True to True
 
         return bool(status)

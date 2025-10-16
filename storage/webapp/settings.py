@@ -1,11 +1,11 @@
-from logging.config import dictConfig
+import json
+import os
+from typing import Dict
+from urllib.parse import quote_plus
+
 from dotenv import load_dotenv
 from flask import Flask
-from urllib.parse import quote_plus
-import json
 from pydantic import BaseModel, ValidationError
-from typing import Dict, Optional
-import os
 
 load_dotenv()
 

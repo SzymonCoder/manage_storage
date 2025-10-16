@@ -1,8 +1,10 @@
 from datetime import datetime
-from sqlalchemy import String, DateTime, Integer, Boolean, Numeric, func, CheckConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from ...extensions import db
 from typing import TYPE_CHECKING
+
+from sqlalchemy import String, DateTime, Integer, Boolean, func, CheckConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from ...extensions import db
 
 # Ten blok jest widoczny tylko dla edytora kodu, a nie dla Pythona podczas uruchamiania.
 # Dzięki niemu edytor wie, czym jest 'ProductSupplierInfo'.
@@ -32,10 +34,10 @@ class Supplier(db.Model):# type: ignore
         onupdate=func.now()
     )
 
-    inbound_orders: Mapped[list['InboundOrder']] = relationship(back_populates='supplier')
+    inbound_orders: Mapped[list['InboundOrder']] = relationship(back_populates='suppliers')
 
     products_suppliers_info: Mapped[list['ProductSupplierInfo']] = relationship(
-        back_populates="supplier"
+        back_populates="suppliers"
     )
 
 

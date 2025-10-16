@@ -1,7 +1,8 @@
-from sqlalchemy import select, func
-from ...extensions import db
-from ..models.inbound_orders import InboundOrder, InboundOrderStatus, InboundOrderProduct
+from sqlalchemy import select
+
 from .generic import GenericRepository
+from ..models.inbound_orders import InboundOrderProduct
+from ...extensions import db
 
 
 class InboundOrderProductRepository(GenericRepository[InboundOrderProduct]):

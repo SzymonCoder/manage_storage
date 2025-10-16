@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-import os
 import json
+import os
 from typing import Dict, List, Any, TypedDict, cast
-from sqlalchemy import create_engine, text, Engine
+
 from dotenv import load_dotenv
 from flask import current_app
-from webapp.settings import Config
-
+from sqlalchemy import create_engine, text, Engine
 # Upewnij się, że ten import jest poprawny w Twojej strukturze projektu
 from webapp.services.stock.dtos import ExternalStockDTO
-
+from webapp.settings import Config
 
 load_dotenv()
 

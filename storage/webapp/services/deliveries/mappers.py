@@ -1,6 +1,6 @@
-from .dtos import ReadInboundOrderDTO, ReadInboundOrderProductsWithOrderDTO
 from webapp.database.models.inbound_orders import InboundOrder
 
+from .dtos import ReadInboundOrderDTO, ReadInboundOrderProductsWithOrderDTO
 
 
 def inbound_order_to_dto(order: InboundOrder) -> ReadInboundOrderDTO:

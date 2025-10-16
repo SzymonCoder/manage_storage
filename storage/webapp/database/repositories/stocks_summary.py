@@ -1,12 +1,12 @@
 from sqlalchemy import select, delete
 
+from .generic import GenericRepository
 from .stock_summary_arch import StockSummaryArchRepository
 from ..models.products import Product
-from ...extensions import db
 from ..models.stocks_summary import StockSummary
 from ..models.stocks_summary_arch import StockSummaryArch
-from .generic import GenericRepository
-from ..models.stocks_with_exp_dates import StockWithExpDate, ExpDateStatus, StockQtyStatus
+from ..models.stocks_with_exp_dates import StockQtyStatus
+from ...extensions import db
 from ...services.extension import ValidationException
 
 

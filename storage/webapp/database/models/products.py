@@ -46,7 +46,7 @@ class Product(db.Model):# type: ignore
 
 
     products_suppliers_info: Mapped[list['ProductSupplierInfo']] = relationship(
-        back_populates="product", cascade="all, delete-orphan")
+        back_populates="products", cascade="all, delete-orphan")
 
-    stocks_summaries_product: Mapped[list["StockSummary"]] = relationship(back_populates="product")
+    stocks_summaries_product: Mapped[list["StockSummary"]] = relationship(back_populates="products")
     stocks_with_exp_dates: Mapped[list["StockWithExpDate"]] = relationship(back_populates="products")

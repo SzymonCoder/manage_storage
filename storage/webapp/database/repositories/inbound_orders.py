@@ -1,10 +1,10 @@
-from sqlalchemy import select, func
+from sqlalchemy import select
 
+from .generic import GenericRepository
+from ..models.inbound_orders import InboundOrder, InboundOrderStatus, InboundOrderProduct
 from ..models.products import Product
 from ..models.suppliers import Supplier
 from ...extensions import db
-from ..models.inbound_orders import InboundOrder, InboundOrderStatus, InboundOrderProduct
-from .generic import GenericRepository
 
 
 class InboundOrderRepository(GenericRepository[InboundOrder]):
