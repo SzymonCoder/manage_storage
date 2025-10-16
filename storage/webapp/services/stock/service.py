@@ -29,10 +29,9 @@ from webapp.services.extension import (
 
 )
 
-from ...services.stock.dtos import ExternalStockDTO, StockSummaryInboundUpdateDTO, ReadStockExpDateDTO
+from ...services.stock.dtos import ExternalStockDTO, StockSummaryInboundUpdateDTO, ReadStockExpDateDTO, StockSummaryDTO
 
-
-from .mapper import to_dto_read_stock_with_exp_date
+from .mapper import to_dto_read_stock_with_exp_date, to_dto_read_stock_summary
 
 
 class StockService:
@@ -85,8 +84,8 @@ class StockService:
         with db.session.begin():
 
 
-            for product_id, value in ordered_qty_in.items():
-                stock_record = self.stocks_summary_repo.get_by_warehouse_id_and_sku(warehouse_id, product_id)
+            for sku, value in ordered_qty_in.items():
+                stock_record = self.stocks_summary_repo.get_by_warehouse_id_and_product_sku(warehouse_id, sku)
 
                 if stock_record:
                     stock_record.ordered_in_qty = value
@@ -98,24 +97,65 @@ class StockService:
         print(f'Stock summary updated with inbound orders')
         return stock_summary_inbound_update_to_dto(warehouse_id, updated_sku_count, updated_qty_count)
 
-# ------------------------------------ Filtry ----------------------------------
+# ------------------------------------ Filtry StockWithExpDate ----------------------------------
 
-def get_all_stock(self) -> list[ReadStockExpDateDTO]:
-    result = list(self.stocks_with_exp_date_repo.get_all())
-    return [to_dto_read_stock_with_exp_date(r) for r in result]
+    def get_all_stock(self) -> list[ReadStockExpDateDTO]:
+        result = list(self.stocks_with_exp_dates_repo.get_all())
+
+        if not result:
+            raise NotFoundDataException('No stock data')
+
+        return [to_dto_read_stock_with_exp_date(res) for res in result]
 
 
-def get_stock_by_warehouse_id(self, warehouse_id: int) -> list[ReadStockExpDateDTO]:
-    result = list(self.stocks_with_exp_date_repo.get_all_by_warehouse_id(warehouse_id))
-    return [to_dto_read_stock_with_exp_date(r) for r in result]
 
-def get_stock_with_status(self, status: str) -> list[ReadStockExpDateDTO]:
-    result = list(self.stocks_with_exp_date_repo.get_all_by_status(status))
-    return [to_dto_read_stock_with_exp_date(r) for r in result]
+    def get_stock_by_warehouse_id(self, warehouse_id: int) -> list[ReadStockExpDateDTO] | None:
+        result = self.stocks_with_exp_dates_repo.get_by_warehouse_id(warehouse_id)
 
-def get_stock_with_sku(self, sku: str) -> list[ReadStockExpDateDTO]:
-    result = list(self.stocks_with_exp_date_repo.get_by_sku(sku))
-    return [to_dto_read_stock_with_exp_date(r) for r in result]
+        if not result:
+            raise NotFoundDataException('No stock data')
+
+        return [to_dto_read_stock_with_exp_date(res) for res in result]
+
+    def get_stock_with_qty_status(self, status: str) -> list[ReadStockExpDateDTO]:
+        result = self.stocks_with_exp_dates_repo.get_by_qty_status(status)
+        if not result:
+            raise NotFoundDataException('No stock data')
+
+        return [to_dto_read_stock_with_exp_date(res) for res in result]
+
+
+    def get_stock_with_exp_date_status(self, status: str) -> list[ReadStockExpDateDTO]:
+        result = self.stocks_with_exp_dates_repo.get_by_exp_date_status(status)
+        if not result:
+            raise NotFoundDataException('No stock data')
+
+        return [to_dto_read_stock_with_exp_date(res) for res in result]
+
+    def get_stock_with_sku(self, sku: str) -> list[ReadStockExpDateDTO]:
+        result = self.stocks_with_exp_dates_repo.get_by_sku(sku)
+        if not result:
+            raise NotFoundDataException('No stock data')
+
+        return [to_dto_read_stock_with_exp_date(res) for res in result]
+
+
+# ------------------------------------ Filtry StockSummary ----------------------------------
+
+
+    def get_stock_with_warehouse_id_and_product_sku(self, warehouse_id: int, sku: str) -> StockSummaryDTO:
+        result = self.stocks_summary_repo.get_by_warehouse_id_and_product_sku(warehouse_id, sku)
+        if not result:
+            raise NotFoundDataException('No stock data')
+
+        return to_dto_read_stock_summary(result)
+
+
+    def get_stock_by_qty_status(self, status: str, warehouse_id: int | None) -> list[StockSummaryDTO]:
+        result = self.stocks_summary_repo.get_by_qty_status(status, warehouse_id)
+        if not result:
+            raise NotFoundDataException('No stock data')
+        return [to_dto_read_stock_summary(res) for res in result]
 
 
 
@@ -158,10 +198,9 @@ def get_stock_with_sku(self, sku: str) -> list[ReadStockExpDateDTO]:
         for sku, product_dtos in dtos_by_sku.items():
             product_id = product_map.get(sku)
             if not product_id:
-                print(f'This prduct do not exist in database {sku}')
-                continue
+                raise NotFoundDataException(f'Product {sku} not found')
             # Delegowanie tworzenia podsumowania i szczegółów
-            summary = self.create_stock_summary(product_dtos, warehouse_id, product_id)
+            summary = self.create_stock_summary(product_dtos, warehouse_id, sku, product_id)
             details = self.create_stock_with_exp_date(product_dtos, warehouse_id)
 
             stock_summary.append(summary)
@@ -174,7 +213,8 @@ def get_stock_with_sku(self, sku: str) -> list[ReadStockExpDateDTO]:
 
 
 
-    def create_stock_summary(self, dtos_of_sku: list[ExternalStockDTO], warehouse_id: int, product_id: int) -> StockSummary:
+    def create_stock_summary(self, dtos_of_sku: list[ExternalStockDTO], warehouse_id: int, sku: str, product_id: int) -> StockSummary:
+
         summary = StockSummary(
             warehouse_id=warehouse_id,
             product_id=product_id,
@@ -184,8 +224,12 @@ def get_stock_with_sku(self, sku: str) -> list[ReadStockExpDateDTO]:
             expired_qty=0,
             qty_total_of_sku=dtos_of_sku[0].qty_total_of_sku,
             status_of_total_qty=self._check_stock_qty_status(dtos_of_sku[0]),
-            ordered_in_qty=self.inbound_orders_repo.get_qty_by_active_orders_by_sku(dtos_of_sku[0].sku, warehouse_id)
+            ordered_in_qty=self.inbound_orders_repo.get_qty_of_ordered_in_product(warehouse_id, sku)
         )
+
+        #znalezeinei product_id
+
+
 
         for dto in dtos_of_sku:
             status = self._check_exp_date_status(dto)
@@ -265,8 +309,13 @@ def get_stock_with_sku(self, sku: str) -> list[ReadStockExpDateDTO]:
 
     def _get_dosage_day(self, sku: str) -> int:
 
-        prod_sup_info = self.product_supplier_info_repo.get_all_by_sku(sku)[0]
-        return prod_sup_info.dosage_days
+        prod_sup_info = self.product_supplier_info_repo.get_all_by_sku(sku)
+        if not prod_sup_info:
+            raise ValueError(f'Product {sku} has no supplier info')
+
+        product = prod_sup_info[0]
+
+        return product.dosage_days
 
 
 

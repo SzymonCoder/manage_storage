@@ -43,6 +43,7 @@ class Container(containers.DeclarativeContainer):
 
     # Singletony dla repozytoriów i serwisów
     inbound_order_repository = providers.Singleton(InboundOrderRepository)
+    inbound_order_service = providers.Singleton(InboundOrderService)
     product_repository = providers.Singleton(ProductRepository)
     product_supplier_info_repository = providers.Singleton(ProductSupplierInfoRepository)
     supplier_repository = providers.Singleton(SupplierRepository)
@@ -67,6 +68,8 @@ class Container(containers.DeclarativeContainer):
         product_supplier_info_repository=product_supplier_info_repository,
         inbound_order_repository=inbound_order_repository,
         warehouse_repository=warehouse_repository,
+        inbound_order_service=inbound_order_service
+
     )
 
     stock_service = providers.Singleton(

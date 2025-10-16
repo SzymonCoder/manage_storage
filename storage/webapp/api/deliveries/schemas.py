@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Literal
 
-from storage.webapp.services.deliveries.dtos import ReadInboundOrderProductDTO
+from webapp.services.deliveries.dtos import ReadInboundOrderProductDTO
 
 
 # ------------------------------------------ Request Schema ------------------------------------------
@@ -42,7 +42,7 @@ class InboundOrderResponseSchema(BaseModel):
     warehouse_id: int
     supplier_id: int
     products: list[ReadInboundOrderProductDTO]
-    status: Literal["approved", "produced", "in_transit", "delivered", "completed", "cancelled"]
+    status: str
 
 
 class ReadInboundOrderProductsWithOrderSchema(BaseModel):

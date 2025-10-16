@@ -41,7 +41,7 @@ def get_stock_by_qty_status(
         stock_service: StockWithExpDate = Provide[Container.stock_service]
     ) -> ResponseReturnValue:
 
-    stock_action = stock_service.get_stock_with_status(qty_status)
+    stock_action = stock_service.get_by_qty_status(qty_status)
     return jsonify([to_schema_dto_read_stock_with_exp_date(stock).model_dump(mode='json') for stock in stock_action]), 200
 
 @stock_exp_date_bp.get("/<string:sku>")

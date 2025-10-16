@@ -9,7 +9,7 @@ def inbound_order_to_dto(order: InboundOrder) -> ReadInboundOrderDTO:
         warehouse_id=order.warehouse_id,
         supplier_id=order.supplier_id,
         products=list(order.products),
-        status=order.status
+        status=order.status.value
     )
 
 def inbound_orders_with_products_to_dto(orders: list[dict]) -> list[ReadInboundOrderProductsWithOrderDTO]:

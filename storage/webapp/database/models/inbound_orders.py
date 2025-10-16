@@ -53,7 +53,7 @@ class InboundOrder(db.Model): # type: ignore
 
 
 
-class InboundOrderProduct(db.Model):
+class InboundOrderProduct(db.Model): # type: ignore
     __tablename__ = "inbound_order_products"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)

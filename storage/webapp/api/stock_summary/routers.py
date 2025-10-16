@@ -14,7 +14,7 @@ from webapp.services.stock.service import StockService
 
 from webapp.containers import Container
 from . import stock_summary_bp
-
+from ...services.stock.mapper import to_dto_read_stock_summary
 
 
 # ----------------------------------------- Update Stock -----------------------------------------
@@ -58,9 +58,8 @@ def get_summary_stock_by_wh_id_and_sku(
         stock_service: StockService = Provide[Container.stock_service]
         ) -> ResponseReturnValue:
 
-    stock_dto = stock_service.stocks_summary_repo.get_by_warehouse_id_and_sku(warehouse_id, sku)
-    response_stock = to_schema_read_summary_stock(stock_dto)
-    return jsonify([schema.model_dump(mode='json') for schema in response_stock]), 200
+    stock_action = stock_service.get_stock_with_warehouse_id_and_product_sku(warehouse_id, sku)
+    return jsonify(to_schema_read_summary_stock(stock_action).model_dump(mode='json')), 200
 
 
 @stock_summary_bp.get("<string:status_of_total_qty>/<int:warehouse_id>")
@@ -71,6 +70,5 @@ def get_summary_stock_by_status_of_total_qty(
         stock_service: StockService = Provide[Container.stock_service]
     ) -> ResponseReturnValue:
     status_of_total_qty = StockSummary.status_of_total_qty.get_enum_by_value(status_of_total_qty)
-    stock_dto = stock_service.stocks_summary_repo.get_by_qty_status(status_of_total_qty, warehouse_id)
-    response_stock = to_schema_read_summary_stock(stock_dto)
-    return jsonify([schema.model_dump(mode='json') for schema in response_stock]), 200
+    stock_dto = stock_service.get_stock_by_qty_status(status_of_total_qty, warehouse_id)
+    return jsonify([to_schema_read_summary_stock(stock).model_dump(mode='json') for stock in stock_dto]), 200

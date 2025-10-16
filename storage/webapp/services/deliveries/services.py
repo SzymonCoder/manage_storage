@@ -43,6 +43,7 @@ from webapp.services.deliveries.dtos import (
 
 )
 
+from typing import cast
 
 
 class InboundOrderService:
@@ -141,7 +142,7 @@ class InboundOrderService:
 
 
 
-    def delete_order(self, dto: DeleteInboundOrderDTO) -> None | int:
+    def delete_order(self, dto: DeleteInboundOrderDTO) -> int | None:
 
         with db.session.begin():
             order = self._ensure_order(dto.inbound_order_id)
@@ -152,11 +153,12 @@ class InboundOrderService:
             else:
                 self.inbound_orders_repo.delete_by_id(order.inbound_order_id)
                 print(f"Order {dto.inbound_order_id} deleted")
+            return dto.inbound_order_id
 
 
 
 
-    def delete_product_in_order(self, dto: DeleteInboundOrderProductDTO) -> None | str:
+    def delete_product_in_order(self, dto: DeleteInboundOrderProductDTO) -> str | None:
 
         with db.session.begin():
             order = self._ensure_order(dto.inbound_order_id)
@@ -176,7 +178,7 @@ class InboundOrderService:
                     f"Product {dto.product_sku} is not associated with order {dto.inbound_order_id}")
 
             db.session.delete(inbound_order_product)
-
+            return dto.product_sku
 
 
 
@@ -184,9 +186,15 @@ class InboundOrderService:
     def get_all_orders_with_products(
             self,
             warehouse_id: int | None = None,
-            statuses: list[InboundOrderStatus] | None = None
+            statuses: list[str] | None = None
     ) -> list[ReadInboundOrderProductsWithOrderDTO]:
-        objects = self.inbound_orders_repo.get_inbound_orders_with_products(warehouse_id, statuses)
+
+        converted_statuses = []
+        if statuses:
+            for status in statuses:
+                converted_statuses.append(InboundOrderStatus(status))
+
+        objects = self.inbound_orders_repo.get_inbound_orders_with_products(warehouse_id, converted_statuses)
         return inbound_orders_with_products_to_dto(objects)
 
 
@@ -200,13 +208,23 @@ class InboundOrderService:
 
 
     def _check_supplier_active(self, supplier_id: int) -> bool:
-        return bool(self.supplier_repo.get_by_id(supplier_id).is_active)
+        supplier = self.supplier_repo.get_by_id(supplier_id)
+        status = supplier and supplier.is_acctive
+
+        # jesli nie ma supplier = False, jesli jest to idzie dale
+        # i sprawdza is_active, jesli is_active = Fasle, to Fasle, jesli True to True
+
+        return bool(status)
 
     def _check_warehouse_active(self, warehouse_id: int) -> bool:
-        return bool(self.warehouse_repo.get_by_id(warehouse_id).is_active)
+        warehouse = self.warehouse_repo.get_by_id(warehouse_id)
+        status = warehouse and warehouse.is_active
+        return bool(status)
 
     def _check_product_active(self, product_sku: str) -> bool:
-        return bool(self.product_repo.get_by_sku(product_sku).is_active)
+        product = self.product_repo.get_by_sku(product_sku)
+        status = product and product.is_active
+        return bool(status)
 
 
 
@@ -232,7 +250,14 @@ class InboundOrderService:
 
     def _add_item_internal(self, inbound_order: InboundOrder, product_dto: CreateOrderProductDTO) -> InboundOrderProduct:
         product = self._ensure_product(product_dto.product_sku)
-        supplier_check = self.supplier_repo.get_by_id(inbound_order.supplier_id)
+
+        supplier_id = cast(int, inbound_order.supplier_id)
+
+        supplier_check = self.supplier_repo.get_by_id(supplier_id)
+
+
+        if supplier_check is None:
+            raise ServiceException(f'Supplier {inbound_order.supplier_id} does not exist')
 
         if not supplier_check.is_active:
             raise ServiceException(f'Supplier {inbound_order.supplier_id} does not support this product')

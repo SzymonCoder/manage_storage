@@ -19,7 +19,7 @@ class StockSummary(db.Model): # type: ignore
     __tablename__ = "stocks_summary"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    warehouse_id: Mapped[int] = Mapped[int],mapped_column(ForeignKey('warehouses.id'))
+    warehouse_id: Mapped[int] = mapped_column(ForeignKey('warehouses.id'))
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id'))
 
     #columny i ilosci w danym statusie daty

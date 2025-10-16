@@ -1,4 +1,6 @@
 from sqlalchemy import select, func
+
+from ..models.products import Product
 from ...extensions import db
 from ..models.inbound_orders import InboundOrder, InboundOrderStatus, InboundOrderProduct
 from .generic import GenericRepository
@@ -38,37 +40,28 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
         stmt = select(InboundOrder).where(InboundOrder.supplier_name.is_(supplier_name))
         return list(db.session.scalars(stmt))
 
-    def get_by_sku(self, sku: str) -> list[InboundOrder] | None:
-        stmt = select(InboundOrder).where(InboundOrder.sku.is_(sku))
-        return list(db.session.scalars(stmt))
+    def get_active_ordered_quantities(self, warehouse_id: int) -> dict[str, int]:
+        orders_with_products = self.get_inbound_orders_with_products(warehouse_id)
+        if not orders_with_products:
+            return {}
 
-    def get_qty_by_active_orders_by_sku(self, sku: str, warehouse_id: int) -> int | None:
-        product_id = self.get_by_sku(sku)[0].product_id
-        active_orders = self.get_active_ordered_quantities(warehouse_id)
-        return active_orders.get(product_id)
+        active_orders_qty = {}
 
-    def get_active_ordered_quantities(self, warehouse_id: int) -> dict:
-        active_statuses = [
-            status for status in InboundOrderStatus
-            if status not in (InboundOrderStatus.CANCELLED, InboundOrderStatus.COMPLETED, InboundOrderStatus.CREATED)
-        ]
+        for order in orders_with_products:
+            if order['sku'] not in active_orders_qty:
+                active_orders_qty[order['sku']] = order['product_qty']
+            else:
+                active_orders_qty[order['sku']] += order['product_qty']
 
-        stmt = (
-            select(
-                InboundOrder.product_id,
-                func.sum(InboundOrder.quantity).label("total_ordered")
-            )
-            .where(
-                InboundOrder.warehouse_id == warehouse_id,
-                InboundOrder.status.in_(active_statuses)
-            )
-            .group_by(InboundOrder.product_id)
-        )
+        return active_orders_qty
 
-        result = db.session.execute(stmt)
 
-        return {row.product_id: row.total_ordered for row in result}
-
+    def get_qty_of_ordered_in_product(self, warehouse_id: int, sku_look: str) -> int | None:
+        all_active_inbound_orders = self.get_active_ordered_quantities(warehouse_id)
+        for sku, qty in all_active_inbound_orders.items():
+            if sku == sku_look:
+                return qty
+        return 0
 
     def get_inbound_orders_with_products(
             self,
@@ -101,8 +94,10 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
                 InboundOrder.status,
                 InboundOrder.warehouse_id,
                 InboundOrder.created_at,
+                Product.sku
             )
             .join(InboundOrder, InboundOrder.id == InboundOrderProduct.inbound_order_id)
+            .join(Product, InboundOrderProduct.product_id == Product.id)
             .where(InboundOrder.status.in_(selected_statuses))
         )
 
@@ -124,6 +119,7 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
                 "status": row.status,
                 "warehouse_id": row.warehouse_id,
                 "created_at": row.created_at,
+                "sku": row.sku
             }
             for row in result
         ]

@@ -36,7 +36,8 @@ def to_schema_dto_order_inbound(dto: ReadInboundOrderDTO) -> InboundOrderRespons
         inbound_order_id=dto.inbound_order_id,
         warehouse_id=dto.warehouse_id,
         supplier_id=dto.supplier_id,
-        products=list(dto.products)
+        products=list(dto.products),
+        status=dto.status
     )
 
 def to_dto_add_product_to_order(schema: AddProductToInboundOrderSchema) -> AddProductToInboundOrderDTO:

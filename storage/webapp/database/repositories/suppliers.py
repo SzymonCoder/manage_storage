@@ -48,7 +48,8 @@ class SupplierRepository(GenericRepository[Supplier]):
         return list(db.session.scalars(stmt))
 
     def get_by_id(self, id: int) -> Supplier | None:
-        return db.session.get(Supplier, id)
+        stmt = select(Supplier).where(Supplier.id == id)
+        return db.session.scalar(stmt)
 
 
     # TODO ogarnąć po nazwach np. albo po kraju :)

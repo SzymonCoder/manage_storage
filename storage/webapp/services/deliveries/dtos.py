@@ -30,7 +30,7 @@ class ReadInboundOrderDTO:
     warehouse_id: int
     supplier_id: int
     products: list["ReadInboundOrderProductDTO"]
-    status: Literal["approved", "produced", "in_transit", "delivered", "completed", "cancelled"]
+    status: str
 
 
 @dataclass(frozen=True)

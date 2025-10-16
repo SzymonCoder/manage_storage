@@ -1,6 +1,6 @@
 from sqlalchemy import select, delete
 from ...extensions import db
-from ..models.stocks_with_exp_dates import StockWithExpDate
+from ..models.stocks_with_exp_dates import StockWithExpDate, StockQtyStatus, ExpDateStatus
 from ..models.stocks_with_exp_dates_arch import StockWithExpDateArch
 from .generic import GenericRepository
 
@@ -16,23 +16,25 @@ class StocksWithExpDateRepository(GenericRepository[StockWithExpDate]):
 
     def get_by_sku(self, sku: str) -> list[StockWithExpDate] | None:
         stmt = select(StockWithExpDate).where(StockWithExpDate.sku.is_(sku))
-        return list(db.session.scalar(stmt))
+        return list(db.session.scalars(stmt))
 
 
-    def get_by_qty_status(self, status: StockWithExpDate.status_of_total_qty) -> list[StockWithExpDate] | None:
-        stmt = select(StockWithExpDate).where(StockWithExpDate.status_of_total_qty.is_(status))
-        return list(db.session.scalar(stmt))
+    def get_by_qty_status(self, status: str) -> list[StockWithExpDate] | None:
+        converted_status = self._map_qty_status(status)
+        stmt = select(StockWithExpDate).where(StockWithExpDate.status_of_total_qty.is_(converted_status))
+        return list(db.session.scalars(stmt))
 
     def get_by_warehouse_id(self, warehouse_id: int) -> list[StockWithExpDate] | None:
-        stmt = select(StockWithExpDate).where(StockWithExpDate.warehouse_id.is_(warehouse_id))
-        return list(db.session.scalar(stmt))
+        stmt = select(StockWithExpDate).where(StockWithExpDate.warehouse_id == warehouse_id)
+        return list(db.session.scalars(stmt))
 
-    def get_by_exp_date_status(self, status: StockWithExpDate.status_of_exp_date) -> list[StockWithExpDate] | None:
-        stmt = select(StockWithExpDate).where(StockWithExpDate.status_of_exp_date.is_(status))
-        return list(db.session.scalar(stmt))
+    def get_by_exp_date_status(self, status: str) -> list[StockWithExpDate] | None:
+        converted_status = self._map_exp_date_status(status)
+        stmt = select(StockWithExpDate).where(StockWithExpDate.status_of_exp_date == converted_status)
+        return list(db.session.scalars(stmt))
 
     def transfer_to_archive(self, warehouse_id: int) -> None:
-        stmt = select(StockWithExpDate).where(StockWithExpDate.warehouse_id.is_(warehouse_id))
+        stmt = select(StockWithExpDate).where(StockWithExpDate.warehouse_id == warehouse_id)
         data_to_archive: list[StockWithExpDate] = list(db.session.scalars(stmt))
 
         if not data_to_archive:
@@ -66,8 +68,25 @@ class StocksWithExpDateRepository(GenericRepository[StockWithExpDate]):
 
 # ------------------------ Aktualizacje statusow i opisu ------------------------
 
-    def _set_exp_date_status(self, status: StockWithExpDate.status_of_exp_date) -> None:
-        self.model.status_of_total_qty = status
+    def _set_exp_date_status(self, obj: StockWithExpDate, status: str) -> None:
+        obj.status_of_exp_date = self._map_exp_date_status(status)
 
-    def _set_total_qty_status(self, status: StockWithExpDate.status_of_total_qty) -> None:
-        self.model.status_of_exp_date = status
+
+    def _set_total_qty_status(self, obj: StockWithExpDate, status: str) -> None:
+        obj.status_of_total_qty = self._map_qty_status(status)
+
+
+
+    def _map_qty_status(self, status: str) -> StockQtyStatus:
+        try:
+            return StockQtyStatus(status)
+        except ValueError:
+            # Obsłuż sytuację, gdy string nie pasuje do żadnego statusu
+            raise ValueError(f"'{status}' is not a valid stock status.")
+
+    def _map_exp_date_status(self, status: str) -> ExpDateStatus:
+        try:
+            return ExpDateStatus(status)
+        except ValueError:
+            # Obsłuż sytuację, gdy string nie pasuje do żadnego statusu
+            raise ValueError(f"'{status}' is not a valid stock status.")

@@ -53,7 +53,6 @@ class StockSummaryDTO:
     status_of_total_qty: str
     created_at: datetime
 
-
 # ---------------------------------------- Stock Exp Date DTOs ----------------------------------------
 
 @dataclass(frozen=True)
@@ -63,5 +62,5 @@ class ReadStockExpDateDTO:
     expiration_date: datetime
     qty_per_exp_date: int
     qty_total_of_sku: int
-    status_of_exp_date: Literal["good_date", "medium_date", "critical_date", "expired", "no_products", "not_apply"]
-    status_of_total_qty: Literal["good_qty", "medium_qty", "critical_qty", "too_low_qty", "no_products"]
+    status_of_exp_date: str
+    status_of_total_qty: str

@@ -13,7 +13,7 @@ from .mappers import (
     to_schema_dto_inbound_order_with_products
 )
 
-from ....webapp.api.deliveries.schemas import (
+from webapp.api.deliveries.schemas import (
     CreateInboundOrderSchema,
     AddProductToInboundOrderSchema,
     SetInboundOrderStatusSchema,
@@ -24,10 +24,10 @@ from ....webapp.api.deliveries.schemas import (
 
 
 
-from ....webapp.services.deliveries.services import InboundOrderService
+from webapp.services.deliveries.services import InboundOrderService
 
 
-from ....webapp.containers import Container
+from webapp.containers import Container
 from . import order_inbound_bp
 
 
@@ -35,7 +35,7 @@ from . import order_inbound_bp
 
 @order_inbound_bp.post("/create_order")
 @inject
-def create_order(inbound_order_service: InboundOrderService = Provide[Container.order_service]) -> ResponseReturnValue:
+def create_order(inbound_order_service: InboundOrderService = Provide[Container.inbound_order_service]) -> ResponseReturnValue:
     payload = CreateInboundOrderSchema.model_validate(request.get_json() or {})
     dto = to_dto_order_inbound(payload)
     read_dto = inbound_order_service.add_inbound_order(dto)
@@ -83,13 +83,13 @@ def delete_order(
 
     ) -> ResponseReturnValue:
     body = request.get_json() or {}
-    schema = DeleteInboundOrderSchema.model_vlaidate({
+    schema = DeleteInboundOrderSchema.model_validate({
         "inbound_order_id": inbound_order_id
     })
 
     dto = to_dto_delete_order(schema.inbound_order_id)
     read_dto = inbound_order_service.delete_order(dto)
-    return jsonify({f'message: Order {dto.inbound_order_id} deleted successfully'}), 200
+    return jsonify({f'message: Order {read_dto} deleted successfully'}), 200
 
 
 @order_inbound_bp.delete("/delete_product_in_order")
@@ -100,7 +100,7 @@ def delete_product_in_order(
     payload = DeleteInboundOrderProductSchema.model_validate(request.get_json() or {})
     dto = to_dto_delete_order_product(payload)
     read_dto = inbound_order_service.delete_product_in_order(dto)
-    return jsonify({f'message: Product {dto.product_sku} deleted successfully from inbound order {dto.inbound_order_id}'}), 200
+    return jsonify({f'message: Product {read_dto} deleted successfully from inbound order {dto.inbound_order_id}'}), 200
 
 
 
@@ -110,8 +110,8 @@ def delete_product_in_order(
 @inject
 def get_all_orders_with_products(inbound_order_service: InboundOrderService = Provide[Container.stock_service]) -> ResponseReturnValue:
 
-    warehouse_id = request.args.get("warehouse_id", default=None, type=int)
-    statuses = request.args.getlist("status")
+    warehouse_id = request.args.get("warehouse_id", type=int)
+    statuses = request.args.getlist("statuses") or None
 
     stock_action = inbound_order_service.get_all_orders_with_products(warehouse_id, statuses or None)
     return jsonify([to_schema_dto_inbound_order_with_products(schema).model_dump(mode='json') for schema in stock_action])

@@ -1,4 +1,4 @@
-from ...database.models.stocks_summary import StockSummary
+from webapp.database.models.stocks_summary import StockSummary
 from webapp.api.stock_summary.schemas import (
     StockResponseSchema,
     StockUpdateResponseSchema,
@@ -12,7 +12,7 @@ from webapp.services.stock.dtos import StockSummaryDTO, StockSummaryInboundUpdat
 
 
 
-def to_schema_read_summary_stock(dto: StockSummaryDTO) -> StockResponseSchema | None:
+def to_schema_read_summary_stock(dto: StockSummaryDTO) -> StockResponseSchema:
     return StockResponseSchema(
         warehouse_id=dto.warehouse_id,
         product_id=dto.product_id,

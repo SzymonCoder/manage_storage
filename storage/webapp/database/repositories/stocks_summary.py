@@ -1,10 +1,13 @@
 from sqlalchemy import select, delete
 
 from .stock_summary_arch import StockSummaryArchRepository
+from ..models.products import Product
 from ...extensions import db
 from ..models.stocks_summary import StockSummary
 from ..models.stocks_summary_arch import StockSummaryArch
 from .generic import GenericRepository
+from ..models.stocks_with_exp_dates import StockWithExpDate, ExpDateStatus, StockQtyStatus
+from ...services.extension import ValidationException
 
 
 class StockSummaryRepository(GenericRepository[StockSummary]):
@@ -18,17 +21,19 @@ class StockSummaryRepository(GenericRepository[StockSummary]):
     def set_qty_in_column(self, qty: int, column_name: str) -> None:
          setattr(self.model, column_name, qty)
 
-    def set_qty_status(self, status: StockSummary.status_of_total_qty) -> None:
-        self.model.status_of_total_qty = status
+    def set_qty_status(self, obj: StockSummary, status: str) -> None:
+        obj.status_of_total_qty = self._map_qty_status(status)
+
 
 
 # ------------------------ Filtry ------------------------
 
-    def get_all(self) -> list[StockSummary] | None:
-        stmt = select(StockSummary)
-        result = list(db.session.scalars(stmt))
-        print(f"Fetched stocks: {result}")
-        return result
+    # takie samo w GenericRepository
+    # def get_all(self) -> list[StockSummary]:
+    #     stmt = select(StockSummary)
+    #     result = list(db.session.scalars(stmt))
+    #     print(f"Fetched stocks: {result}")
+    #     return result
 
         # return list(db.session.scalars(stmt))
 
@@ -40,20 +45,28 @@ class StockSummaryRepository(GenericRepository[StockSummary]):
         stmt = select(StockSummary).where(StockSummary.expired_qty.isnot(None))
         return list(db.session.scalar(stmt))
 
-    def get_by_qty_status(self, status: StockSummary.status_of_total_qty, warehouse_id: int | None) -> list[StockSummary] | None:
+    def get_by_qty_status(self, status: str, warehouse_id: int | None) -> list[StockSummary] | None:
+        mapped_status = self._map_qty_status(status)
         if not warehouse_id:
-            stmt = select(StockSummary).where(StockSummary.status_of_total_qty.is_(status))
+            stmt = select(StockSummary).where(StockSummary.status_of_total_qty == mapped_status)
         else:
-            stmt = select(StockSummary).where(StockSummary.warehouse_id.is_(warehouse_id)).where(StockSummary.status_of_total_qty.is_(status))
+            stmt = (select(StockSummary)
+                    .where(StockSummary.warehouse_id == warehouse_id)
+                    .where(StockSummary.status_of_total_qty == mapped_status))
+
         return list(db.session.scalars(stmt))
 
-    def get_by_warehouse_id(self, warehouse_id: int) -> list[StockSummary] | None:
+    def get_by_warehouse_id(self, warehouse_id: int) -> list[StockSummary]:
         stmt = select(StockSummary).where(StockSummary.warehouse_id.is_(warehouse_id))
-        return list(db.session.scalar(stmt))
+        return list(db.session.scalars(stmt))
 
 
-    def get_by_warehouse_id_and_sku(self, warehouse_id: int, sku: str) -> StockSummary | None:
-        stmt = select(StockSummary).where(StockSummary.warehouse_id.is_(warehouse_id)).where(StockSummary.sku.is_(sku))
+    def get_by_warehouse_id_and_product_sku(self, warehouse_id: int, sku: str) -> StockSummary | None:
+        stmt = (select(StockSummary)
+            .join(Product, StockSummary.product_id == Product.id)  # join do Product
+            .where(StockSummary.warehouse_id == warehouse_id)
+            .where(Product.sku == sku)
+        )
         return db.session.scalar(stmt)
 
 
@@ -84,3 +97,10 @@ class StockSummaryRepository(GenericRepository[StockSummary]):
         delete_stmt = delete(StockSummary).where(StockSummary.id.in_([rec.id for rec in new_archive_models]))
         db.session.execute(delete_stmt)
 
+
+
+    def _map_qty_status(self, status: str) -> StockQtyStatus:
+        try:
+            return StockQtyStatus(status)
+        except ValueError:
+            raise ValidationException(f'Invalid status {status}')
