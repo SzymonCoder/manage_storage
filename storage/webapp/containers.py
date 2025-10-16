@@ -23,6 +23,7 @@ from webapp.database.repositories.warehouses import WarehouseRepository
 from webapp.services.deliveries.services import InboundOrderService
 from webapp.services.stock.service import StockService
 
+from webapp.database.repositories.inbound_order_product import InboundOrderProductRepository
 
 
 # Klasa Container to kontener DI, dziedziczacy po DeclarativeContainer i bedzie
@@ -34,7 +35,8 @@ class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
         packages=[
             "webapp.api.stock_summary",
-            "webapp.api.stock_exp_date" #zastanwoci sie czy nie podizelic Container na ContainerInboundOrder i Stock i zrobic dwa i podzielic w api na dwie paczki
+            "webapp.api.stock_exp_date",
+            "webapp.api.deliveries" #zastanwoci sie czy nie podizelic Container na ContainerInboundOrder i Stock i zrobic dwa i podzielic w api na dwie paczki
         ]
     )
 
@@ -50,6 +52,9 @@ class Container(containers.DeclarativeContainer):
     warehouse_repository = providers.Singleton(WarehouseRepository)
     stock_summary_arch_repository = providers.Singleton(StockSummaryArchRepository)
     stock_with_exp_dates_arch_repository = providers.Singleton(StockWithExpDateArchRepository)
+    inbound_order_product_repository = providers.Singleton(InboundOrderProductRepository)
+
+
 
     stock_summary_repository = providers.Singleton(
         StockSummaryRepository,
@@ -81,4 +86,21 @@ class Container(containers.DeclarativeContainer):
         stock_with_exp_dates_arch_repo=stock_with_exp_dates_arch_repository,
         product_supplier_info_repo=product_supplier_info_repository,
         external_stock_repo=external_stock_repository,
+        product_repo=product_repository,
+    )
+
+    inbound_order_service = providers.Singleton(
+        InboundOrderService,
+        inbound_orders_repo=inbound_order_repository,
+        stocks_summary_repo=stock_summary_repository,
+        stocks_with_exp_dates_repo=stocks_with_exp_dates_repository,
+        stock_summary_arch_repo=stock_summary_arch_repository,
+        stock_with_exp_dates_arch_repo=stock_with_exp_dates_arch_repository,
+        product_supplier_info_repo=product_supplier_info_repository,
+        external_stock_repo=external_stock_repository,
+        product_repo=product_repository,
+        supplier_repo=supplier_repository,
+        warehouse_repo=warehouse_repository,
+        stock_service=stock_service,
+        inbound_order_product_repo=inbound_order_product_repository
     )

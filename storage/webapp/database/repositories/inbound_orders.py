@@ -1,6 +1,7 @@
 from sqlalchemy import select, func
 
 from ..models.products import Product
+from ..models.suppliers import Supplier
 from ...extensions import db
 from ..models.inbound_orders import InboundOrder, InboundOrderStatus, InboundOrderProduct
 from .generic import GenericRepository
@@ -89,8 +90,8 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
                 InboundOrderProduct.id.label("inbound_order_product_id"),
                 InboundOrderProduct.inbound_order_id,
                 InboundOrderProduct.product_id,
-                InboundOrderProduct.qty.label("product_qty"),
-                InboundOrder.supplier_name,
+                InboundOrderProduct.quantity.label("product_qty"),
+                Supplier.name.label("supplier_name"),
                 InboundOrder.status,
                 InboundOrder.warehouse_id,
                 InboundOrder.created_at,

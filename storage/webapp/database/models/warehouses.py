@@ -32,5 +32,5 @@ class Warehouse(db.Model):# type: ignore
         onupdate=func.now()
     )
 
-    stocks_summary: Mapped['StockSummary'] = relationship(back_populates='warehouse')
+    stocks_summaries_warehouse: Mapped['StockSummary'] = relationship(back_populates='warehouse')
     stocks_summary_arch: Mapped['StockSummaryArch'] = relationship(back_populates='warehouse')

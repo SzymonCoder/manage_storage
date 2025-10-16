@@ -1,4 +1,7 @@
 from sqlalchemy import select, delete
+from sqlalchemy.orm import joinedload
+
+from ..models.products import Product
 from ...extensions import db
 from ..models.stocks_with_exp_dates import StockWithExpDate, StockQtyStatus, ExpDateStatus
 from ..models.stocks_with_exp_dates_arch import StockWithExpDateArch
@@ -14,14 +17,21 @@ class StocksWithExpDateRepository(GenericRepository[StockWithExpDate]):
 
 # ------------------------ Filtry ------------------------
 
+    # def get_by_sku(self, sku: str) -> list[StockWithExpDate] | None:
+    #     stmt = select(StockWithExpDate).where(StockWithExpDate.Product.sku == sku)
+    #     return list(db.session.scalars(stmt))
     def get_by_sku(self, sku: str) -> list[StockWithExpDate] | None:
-        stmt = select(StockWithExpDate).where(StockWithExpDate.sku.is_(sku))
+        stmt = (
+            select(StockWithExpDate)
+            .join(StockWithExpDate.products)  # używamy relacji 'products'
+            .where(Product.sku == sku)  # filtr po kolumnie Product.sku
+            .options(joinedload(StockWithExpDate.products))  # załaduj relację
+        )
         return list(db.session.scalars(stmt))
-
 
     def get_by_qty_status(self, status: str) -> list[StockWithExpDate] | None:
         converted_status = self._map_qty_status(status)
-        stmt = select(StockWithExpDate).where(StockWithExpDate.status_of_total_qty.is_(converted_status))
+        stmt = select(StockWithExpDate).where(StockWithExpDate.status_of_total_qty == converted_status)
         return list(db.session.scalars(stmt))
 
     def get_by_warehouse_id(self, warehouse_id: int) -> list[StockWithExpDate] | None:

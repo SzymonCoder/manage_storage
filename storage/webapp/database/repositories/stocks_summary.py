@@ -57,7 +57,7 @@ class StockSummaryRepository(GenericRepository[StockSummary]):
         return list(db.session.scalars(stmt))
 
     def get_by_warehouse_id(self, warehouse_id: int) -> list[StockSummary]:
-        stmt = select(StockSummary).where(StockSummary.warehouse_id.is_(warehouse_id))
+        stmt = select(StockSummary).where(StockSummary.warehouse_id == warehouse_id)
         return list(db.session.scalars(stmt))
 
 

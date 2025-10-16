@@ -81,16 +81,14 @@ class StockService:
         updated_sku_count = 0
         updated_qty_count = 0
 
-        with db.session.begin():
 
+        for sku, value in ordered_qty_in.items():
+            stock_record = self.stocks_summary_repo.get_by_warehouse_id_and_product_sku(warehouse_id, sku)
 
-            for sku, value in ordered_qty_in.items():
-                stock_record = self.stocks_summary_repo.get_by_warehouse_id_and_product_sku(warehouse_id, sku)
-
-                if stock_record:
-                    stock_record.ordered_in_qty = value
-                    updated_sku_count += 1
-                    updated_qty_count += value
+            if stock_record:
+                stock_record.ordered_in_qty = value
+                updated_sku_count += 1
+                updated_qty_count += value
 
 
 
@@ -146,7 +144,7 @@ class StockService:
     def get_stock_with_warehouse_id_and_product_sku(self, warehouse_id: int, sku: str) -> StockSummaryDTO:
         result = self.stocks_summary_repo.get_by_warehouse_id_and_product_sku(warehouse_id, sku)
         if not result:
-            raise NotFoundDataException('No stock data')
+            raise NotFoundDataException('No stock data was found')
 
         return to_dto_read_stock_summary(result)
 
@@ -154,7 +152,7 @@ class StockService:
     def get_stock_by_qty_status(self, status: str, warehouse_id: int | None) -> list[StockSummaryDTO]:
         result = self.stocks_summary_repo.get_by_qty_status(status, warehouse_id)
         if not result:
-            raise NotFoundDataException('No stock data')
+            raise NotFoundDataException('No stock data was found')
         return [to_dto_read_stock_summary(res) for res in result]
 
 

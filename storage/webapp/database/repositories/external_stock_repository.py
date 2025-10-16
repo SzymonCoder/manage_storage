@@ -6,6 +6,7 @@ from typing import Dict, List, Any, TypedDict, cast
 from sqlalchemy import create_engine, text, Engine
 from dotenv import load_dotenv
 from flask import current_app
+from webapp.settings import Config
 
 # Upewnij się, że ten import jest poprawny w Twojej strukturze projektu
 from webapp.services.stock.dtos import ExternalStockDTO
@@ -89,7 +90,7 @@ class ExternalStockRepository:
             return current_app.config.get('WAREHOUSE_DB_CONFIGS', {})
         except RuntimeError:
             # Fallback for calls made outside application context (e.g., tests)
-            from webapp.settings import Config
+
             return Config.WAREHOUSE_DB_CONFIGS
 
     def _ensure_warehouse(self, warehouse_id: int) -> _WarehouseCacheEntry:
@@ -115,11 +116,11 @@ class ExternalStockRepository:
             )
 
         engine = create_engine(db_uri, pool_pre_ping=True, pool_recycle=1800)
-        self._cache[wid] = cast(_WarehouseCacheEntry,{
+        self._cache[wid] = cast(_WarehouseCacheEntry, cast(object, {
             "engine": engine,
             "table_name": table_name,
             "column_map": column_mappings,
-        })
+        }))
         return self._cache[wid]
 
     # ------------------------------------ Public API ------------------------------------

@@ -53,7 +53,7 @@ def add_product_to_order(
     return jsonify(to_schema_dto_order_inbound(read_dto).model_dump(mode='json')), 201
 
 
-@order_inbound_bp.patch("/update_product_in_order")
+@order_inbound_bp.patch("/update_product_status_in_order")
 @inject
 def update_order_inbound_status(
         inbound_order_service: InboundOrderService = Provide[Container.inbound_order_service]
@@ -80,21 +80,16 @@ def update_qty_sku_in_order(
 def delete_order(
         inbound_order_id: int,
         inbound_order_service: InboundOrderService = Provide[Container.inbound_order_service],
-
-    ) -> ResponseReturnValue:
-    body = request.get_json() or {}
-    schema = DeleteInboundOrderSchema.model_validate({
-        "inbound_order_id": inbound_order_id
-    })
-
+) -> ResponseReturnValue:
+    schema = DeleteInboundOrderSchema(inbound_order_id=inbound_order_id)
     dto = to_dto_delete_order(schema.inbound_order_id)
-    read_dto = inbound_order_service.delete_order(dto)
-    return jsonify({f'message: Order {read_dto} deleted successfully'}), 200
+    inbound_order_service.delete_order(dto)
+    return jsonify({"message": f"Order {inbound_order_id} deleted successfully"}), 200
 
 
 @order_inbound_bp.delete("/delete_product_in_order")
+@inject
 def delete_product_in_order(
-        inbound_order_id: int,
         inbound_order_service: InboundOrderService = Provide[Container.inbound_order_service]
 ) -> ResponseReturnValue:
     payload = DeleteInboundOrderProductSchema.model_validate(request.get_json() or {})
@@ -108,7 +103,7 @@ def delete_product_in_order(
 
 @order_inbound_bp.get("/all")
 @inject
-def get_all_orders_with_products(inbound_order_service: InboundOrderService = Provide[Container.stock_service]) -> ResponseReturnValue:
+def get_all_orders_with_products(inbound_order_service: InboundOrderService = Provide[Container.inbound_order_service]) -> ResponseReturnValue:
 
     warehouse_id = request.args.get("warehouse_id", type=int)
     statuses = request.args.getlist("statuses") or None

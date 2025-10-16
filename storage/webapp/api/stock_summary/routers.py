@@ -62,13 +62,13 @@ def get_summary_stock_by_wh_id_and_sku(
     return jsonify(to_schema_read_summary_stock(stock_action).model_dump(mode='json')), 200
 
 
-@stock_summary_bp.get("<string:status_of_total_qty>/<int:warehouse_id>")
+@stock_summary_bp.get("/<int:warehouse_id>/status/<string:status_of_total_qty>")
 @inject
 def get_summary_stock_by_status_of_total_qty(
         warehouse_id: int | None,
         status_of_total_qty: str,
         stock_service: StockService = Provide[Container.stock_service]
     ) -> ResponseReturnValue:
-    status_of_total_qty = StockSummary.status_of_total_qty.get_enum_by_value(status_of_total_qty)
+    status_of_total_qty = stock_service.get_stock_by_qty_status(status_of_total_qty, warehouse_id)
     stock_dto = stock_service.get_stock_by_qty_status(status_of_total_qty, warehouse_id)
     return jsonify([to_schema_read_summary_stock(stock).model_dump(mode='json') for stock in stock_dto]), 200

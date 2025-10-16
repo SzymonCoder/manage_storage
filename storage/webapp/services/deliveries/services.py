@@ -251,9 +251,10 @@ class InboundOrderService:
     def _add_item_internal(self, inbound_order: InboundOrder, product_dto: CreateOrderProductDTO) -> InboundOrderProduct:
         product = self._ensure_product(product_dto.product_sku)
 
-        supplier_id = cast(int, inbound_order.supplier_id)
+        supplier_id = inbound_order.supplier_id
 
-        supplier_check = self.supplier_repo.get_by_id(supplier_id)
+
+        supplier_check = self.supplier_repo.get_by_id(supplier_id) # type: ignore
 
 
         if supplier_check is None:

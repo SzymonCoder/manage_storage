@@ -1,8 +1,10 @@
-from typing import Iterable
+from typing import Iterable, Generic, TypeVar
 from sqlalchemy import select
 from flask_sqlalchemy.model import Model
 from ...extensions import db
 from abc import ABC
+
+T = TypeVar("T", bound=Model)
 
 
 class GenericRepository[T: Model]:
