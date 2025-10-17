@@ -62,10 +62,13 @@ class StockSummaryRepository(GenericRepository[StockSummary]):
 
 
     def get_by_warehouse_id_and_product_sku(self, warehouse_id: int, sku: str) -> StockSummary | None:
-        stmt = (select(StockSummary)
-            .join(Product, StockSummary.product_id == Product.id)  # join do Product
-            .where(StockSummary.warehouse_id == warehouse_id)
-            .where(Product.sku == sku)
+        stmt = (
+            select(StockSummary)
+            .join(StockSummary.product)  # ORM-owy join
+            .where(
+                StockSummary.warehouse_id == warehouse_id,
+                Product.sku == sku
+            )
         )
         return db.session.scalar(stmt)
 

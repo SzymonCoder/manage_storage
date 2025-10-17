@@ -34,7 +34,8 @@ class Supplier(db.Model):# type: ignore
         onupdate=func.now()
     )
 
-    inbound_orders: Mapped[list['InboundOrder']] = relationship(back_populates='suppliers')
+    inbound_orders = relationship("InboundOrder", back_populates="supplier")
+
 
     products_suppliers_info: Mapped[list['ProductSupplierInfo']] = relationship(
         back_populates="suppliers"

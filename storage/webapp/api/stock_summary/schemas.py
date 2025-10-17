@@ -16,7 +16,7 @@ class StockResponseSchema(BaseModel):
     critical_date_qty: int
     expired_qty: int
     qty_total_of_sku: int
-    ordered_in_qty: int
+    ordered_in_qty: int = 0
     status_of_total_qty: str
     created_at: datetime
 

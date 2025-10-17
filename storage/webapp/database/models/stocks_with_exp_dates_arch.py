@@ -4,6 +4,11 @@ from sqlalchemy import Integer, String, DateTime, Boolean, func, ForeignKey, Enu
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ...extensions import db
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .warehouses import Warehouse
+
 
 class StockQtyStatus(PyEnum):
     GOOD = 'good_qty'
@@ -47,4 +52,8 @@ class StockWithExpDateArch(db.Model): # type: ignore
         nullable=False,
         server_default=func.now(),
         onupdate=func.now()
+    )
+
+    warehouse: Mapped['Warehouse'] = relationship(
+        back_populates='stocks_with_exp_dates_arch'
     )

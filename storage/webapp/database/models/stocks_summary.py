@@ -49,5 +49,8 @@ class StockSummary(db.Model): # type: ignore
         server_default=func.now(),
     )
 
-    warehouse: Mapped['Warehouse'] = relationship(back_populates='stocks_summaries_warehouse')
+    warehouse: Mapped['Warehouse'] = relationship(
+        back_populates='stocks_summaries'
+    )
+
     product: Mapped['Product'] = relationship(back_populates='stocks_summaries_product')

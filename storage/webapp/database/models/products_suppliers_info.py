@@ -36,8 +36,8 @@ class ProductSupplierInfo(db.Model): # type: ignore
     )
 
 
-    product: Mapped["Product"] = relationship(back_populates="products_suppliers_info")
-    supplier: Mapped["Supplier"] = relationship(back_populates="products_suppliers_info")
+    products: Mapped["Product"] = relationship(back_populates="products_suppliers_info")
+    suppliers: Mapped["Supplier"] = relationship(back_populates="products_suppliers_info")
 
     __table_args__ = (CheckConstraint('production_time_days > 0',
                                       name='chk_production_time_days_positiv_digits'),

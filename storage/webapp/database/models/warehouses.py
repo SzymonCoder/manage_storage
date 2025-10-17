@@ -9,6 +9,7 @@ from ...extensions import db
 if TYPE_CHECKING:
     from .stocks_summary import StockSummary
     from .stocks_summary_arch import StockSummaryArch
+    from .stocks_with_exp_dates_arch import StockWithExpDateArch
 
 
 
@@ -34,5 +35,14 @@ class Warehouse(db.Model):# type: ignore
         onupdate=func.now()
     )
 
-    stocks_summaries_warehouse: Mapped['StockSummary'] = relationship(back_populates='warehouses')
-    stocks_summary_arch: Mapped['StockSummaryArch'] = relationship(back_populates='warehouses')
+    stocks_summaries: Mapped[list['StockSummary']] = relationship(
+        back_populates='warehouse', cascade="all, delete-orphan"
+    )
+
+    stocks_summary_arch: Mapped[list['StockSummaryArch']] = relationship(
+        back_populates='warehouse', cascade="all, delete-orphan"
+    )
+
+    stocks_with_exp_dates_arch: Mapped[list['StockWithExpDateArch']] = relationship(
+        back_populates='warehouse', cascade="all, delete-orphan"
+    )

@@ -45,7 +45,7 @@ def get_summary_stock_by_wh_id(warehouse_id: int, stock_service: StockService = 
 
 
 
-@stock_summary_bp.get("/<int:warehouse_id>/<string:sku>")
+@stock_summary_bp.get("/<int:warehouse_id>/sku/<string:sku>")
 @inject
 def get_summary_stock_by_wh_id_and_sku(
         warehouse_id: int,
