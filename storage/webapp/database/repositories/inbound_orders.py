@@ -17,8 +17,17 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
     def edit_status(self, order: InboundOrder, status: InboundOrderStatus) -> None:
         order.status = status
 
-    def edit_qty(self, order: InboundOrder, qty: int) -> None:
-        order.qty = qty
+    def edit_qty(self, order_id: int, sku: str, qty: int) -> None:
+        products = self.get_inbound_order_with_products(order_id)
+        product_id = self._get_product_id_by_sku(sku)
+
+        for product in products:
+            if product.product_id == product_id:
+                product.quantity = qty
+            else:
+                raise Exception(f"Product {sku} not found in order {order_id}")
+
+
 
     def edit_product_id(self, order: InboundOrder, product_id: int) -> None:
         order.product_id = product_id
@@ -64,6 +73,15 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
                 return qty
         return 0
 
+    def get_inbound_order_with_products(
+            self,
+            order_id: int,
+    ) -> list[InboundOrderProduct]:
+        stmt = select(InboundOrderProduct).where(InboundOrderProduct.inbound_order_id == order_id)
+        return db.session.scalars(stmt)
+
+
+
     def get_inbound_orders_with_products(
             self,
             warehouse_id: int | None = None,
@@ -78,9 +96,14 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
         """
 
         # Domyślnie tylko aktywne zamówienia
+        # active_statuses = [
+        #     status for status in InboundOrderStatus
+        #     if status not in (InboundOrderStatus.CANCELLED, InboundOrderStatus.CREATED)
+        # ]
+
         active_statuses = [
             status for status in InboundOrderStatus
-            if status not in (InboundOrderStatus.CANCELLED, InboundOrderStatus.CREATED)
+            if status.name not in ("CANCELLED", "CREATED")
         ]
 
         selected_statuses = statuses or active_statuses
@@ -124,3 +147,7 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
             }
             for row in result
         ]
+
+    def _get_product_id_by_sku(self, sku: str) -> int | None:
+        stmt = select(Product.id).where(Product.sku == sku)
+        return db.session.scalar(stmt)

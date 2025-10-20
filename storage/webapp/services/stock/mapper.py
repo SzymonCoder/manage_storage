@@ -5,6 +5,8 @@ from .dtos import StockDTO, StockSummaryInboundUpdateDTO, ReadStockExpDateDTO, S
 
 
 def stock_to_dto(stock: list[StockSummary]) -> StockDTO:
+    if not stock:
+        raise ValueError("List of StockSummary is empty")
     one = stock[0]
     return StockDTO(
         warehouse_id=one.warehouse_id,

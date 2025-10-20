@@ -69,8 +69,7 @@ class ProductRepository(GenericRepository[Product]):
         return db.session.scalar(stmt)
 
     def get_all_by_active_status(self, status: bool) -> list[Product] | None:
-        stmt = select(Product).where(Product.is_active.is_(status))
-        #alternatywa stmt = select(Product).where(Product.is_active == status)
+        stmt = select(Product).where(Product.is_active == status)
         return list(db.session.scalars(stmt))
 
     def get_dict_of_all_sku(self) -> dict[str, int]:

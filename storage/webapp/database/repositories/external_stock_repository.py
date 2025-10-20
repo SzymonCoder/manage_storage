@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import datetime
 from typing import Dict, List, Any, TypedDict, cast
 
 from dotenv import load_dotenv
@@ -48,7 +49,7 @@ class ExternalStockRepository:
         self._cache = {}
 
     # ------------------------------------ Helpers ------------------------------------
-    def _get_warehouse_config(self, warehouse_id: int) -> Dict[str, Any]:
+    def _get_warehouse_config(self, warehouse_id: int = 1) -> Dict[str, Any]:
         """Pobiera konfigurację i silnik bazy danych dla danego magazynu, używając cache."""
         wid = str(warehouse_id)
 
@@ -129,7 +130,7 @@ class ExternalStockRepository:
         config = self._get_warehouse_config(warehouse_id)
         column_map = config["column_mappings"]
 
-        required_keys = ("product_code", "exp_date", "qty_exp_date", "qty_total_sku", "warehouse_ref", "updated_at")
+        required_keys = ("product_code", "exp_date", "qty_exp_date", "qty_total_sku", "warehouse_ref")
         for key in required_keys:
             if key not in column_map:
                 raise RuntimeError(
@@ -137,7 +138,7 @@ class ExternalStockRepository:
                 )
 
         select_clause = ", ".join(
-            [f'"{external}" AS "{internal}"' for internal, external in column_map.items()]
+            [f'`{external}` AS `{internal}`' for internal, external in column_map.items()]
         )
         wh_ref_column = column_map["warehouse_ref"]
         table = config["table_name"]
@@ -145,11 +146,15 @@ class ExternalStockRepository:
 
         with engine.connect() as connection:
             query = text(
-                f'SELECT {select_clause} FROM "{table}" '
-                f'WHERE "{wh_ref_column}" = :wh_id '
-                f'ORDER BY "{column_map["updated_at"]}" DESC'
+                f'SELECT {select_clause} FROM `{table}` '
+                f'WHERE `{wh_ref_column}` = :wh_id'
             )
             result = connection.execute(query, {"wh_id": warehouse_id})
             rows = result.mappings().all()
 
-        return [ExternalStockDTO.model_validate(dict(row)) for row in rows]
+        records = []
+        for row in rows:
+            data = dict(row)
+            # NIE konwertujemy pól typu datetime/date na string
+            records.append(ExternalStockDTO.model_validate(data))
+        return records

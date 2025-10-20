@@ -38,7 +38,7 @@ class StockSummaryRepository(GenericRepository[StockSummary]):
         # return list(db.session.scalars(stmt))
 
     def get_by_sku(self, sku: str) -> list[StockSummary] | None:
-        stmt = select(StockSummary).where(StockSummary.sku.is_(sku))
+        stmt = select(StockSummary).join(Product, Product.id == StockSummary.product_id).where(Product.sku == sku)
         return list(db.session.scalar(stmt))
 
     def get_by_expired_qty(self) -> list[StockSummary] | None:
@@ -74,7 +74,7 @@ class StockSummaryRepository(GenericRepository[StockSummary]):
 
 
     def transfer_to_archive(self, warehouse_id: int) -> None:
-        stmt = select(StockSummary).where(StockSummary.warehouse_id.is_(warehouse_id))
+        stmt = select(StockSummary).where(StockSummary.warehouse_id == warehouse_id)
         data_to_archive: list[StockSummary] = list(db.session.scalars(stmt))
 
         if not data_to_archive:
@@ -96,9 +96,8 @@ class StockSummaryRepository(GenericRepository[StockSummary]):
         ]
 
         self.arch_repo.add_many(new_archive_models)
+        self.delete_all()
 
-        delete_stmt = delete(StockSummary).where(StockSummary.id.in_([rec.id for rec in new_archive_models]))
-        db.session.execute(delete_stmt)
 
 
 

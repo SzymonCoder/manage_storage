@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum as PyEnum
 from sqlalchemy import Integer, String, DateTime, Boolean, func, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from ...extensions import db
+from webapp.extensions import db
 
 from typing import TYPE_CHECKING
 
@@ -12,19 +12,19 @@ if TYPE_CHECKING:
 
 
 class StockQtyStatus(PyEnum):
-    GOOD = 'good_qty'
-    MEDIUM = 'medium_qty'
-    CRITICAL = 'critical_qty'
-    TOO_LOW = 'too_low_qty'
-    EMPTY = 'no_products'
+    GOOD = 'GOOD'
+    MEDIUM = 'MEDIUM'
+    CRITICAL = 'CRITICAL'
+    TOO_LOW = 'TOO_LOW'
+    EMPTY = 'EMPTY'
 
 class ExpDateStatus(PyEnum):
-    GOOD = 'good_date'
-    MEDIUM = 'medium_date'
-    CRITICAL = 'critical_date'
-    EXPIRED = 'expired'
-    EMPTY = 'no_products'
-    NOT_APPLY= 'not_apply' # nie dotyczy tego produktu
+    GOOD = 'GOOD'
+    MEDIUM = 'MEDIUM'
+    CRITICAL = 'CRITICAL'
+    EXPIRED = 'EXPIRED'
+    EMPTY = 'EMPTY'
+    NOT_APPLY= 'NOT_APPLY' # nie dotyczy tego produktu
 
 
 

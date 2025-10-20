@@ -29,6 +29,9 @@ class GenericRepository[T: Model]:
         if obj:
             db.session.delete(obj)
 
+    def delete_all(self) -> None:
+        return db.session.query(self.model).delete()
+
     def get(self, pk: int) -> T | None:
         return db.session.get(self.model, pk)
 

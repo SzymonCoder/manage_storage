@@ -1,5 +1,8 @@
 # plik z kontenerem dla repozytorium czy innych serwis tak by jeden kontenr byl odpalany w ramach jednej aplikacji
+from typing import Any
+
 from dependency_injector import containers, providers
+from dependency_injector.providers import Singleton
 # ... existing code ...database.repositories.external_stock_repository import ExternalStockRepository
 from webapp.database.repositories.external_stock_repository import ExternalStockRepository
 from webapp.database.repositories.inbound_order_product import InboundOrderProductRepository
@@ -64,15 +67,15 @@ class Container(containers.DeclarativeContainer):
 
     external_stock_repository = providers.Singleton(ExternalStockRepository)
 
-    deliveries_service = providers.Singleton(
-        InboundOrderService,
-        supplier_repository=supplier_repository,
-        product_supplier_info_repository=product_supplier_info_repository,
-        inbound_order_repository=inbound_order_repository,
-        warehouse_repository=warehouse_repository,
-        inbound_order_service=inbound_order_service
-
-    )
+    # deliveries_service: Singleton[Any] = providers.Singleton(
+    #     InboundOrderService,
+    #     supplier_repository=supplier_repository,
+    #     product_supplier_info_repository=product_supplier_info_repository,
+    #     inbound_order_repository=inbound_order_repository,
+    #     warehouse_repository=warehouse_repository,
+    #     inbound_order_service=inbound_order_service
+    #
+    # )
 
     stock_service = providers.Singleton(
         StockService,

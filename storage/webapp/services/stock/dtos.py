@@ -1,5 +1,5 @@
 from pydantic import Field
-from datetime import datetime
+from datetime import datetime, date
 from typing import Mapping, Any, Literal
 from dataclasses import dataclass
 
@@ -11,15 +11,18 @@ class UpdateStockDTO:
 @dataclass(frozen=True)
 class ExternalStockDTO:
     sku: str = Field(alias='product_code')
-    expiration_date: datetime = Field(alias='exp_date')
+    expiration_date: date = Field(alias='exp_date')
     qty_per_exp_date: int = Field(alias='qty_exp_date')
     qty_total_of_sku: int = Field(alias='qty_total_sku')
 
     @classmethod
     def model_validate(cls, row: Mapping[str, Any]):
+        exp_value = row.get("exp_date")
+        # zostawiamy datę lub datetime tak, jak jest
+        # nie robimy datetime.fromisoformat ani str
         return cls(
             sku=str(row["product_code"]),
-            expiration_date=datetime.fromisoformat(row["exp_date"]),
+            expiration_date=exp_value,
             qty_per_exp_date=int(row["qty_exp_date"]),
             qty_total_of_sku=int(row["qty_total_sku"])
         )

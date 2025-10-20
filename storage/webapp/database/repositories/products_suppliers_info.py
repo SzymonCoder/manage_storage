@@ -3,6 +3,7 @@ from decimal import Decimal
 from sqlalchemy import select
 
 from .generic import GenericRepository
+from ..models.products import Product
 from ..models.products_suppliers_info import ProductSupplierInfo
 from ...extensions import db
 
@@ -29,11 +30,13 @@ class ProductSupplierInfoRepository(GenericRepository[ProductSupplierInfo]):
 # ------------------------ Filtrowanie ------------------------
 
     def get_all_by_sku(self, sku: str ) -> list[ProductSupplierInfo] | None:
-        stmt = select(ProductSupplierInfo).where(ProductSupplierInfo.id_product.is_(sku))
+        stmt = (select(ProductSupplierInfo)
+                .join(Product, ProductSupplierInfo.id_product == Product.id)
+                .where(Product.sku == sku))
         return list(db.session.scalars(stmt))
 
     def get_all_by_supplier_id(self, supplier_id: int) -> list[ProductSupplierInfo] | None:
-        stmt = select(ProductSupplierInfo).where(ProductSupplierInfo.id_supplier.is_(supplier_id))
+        stmt = select(ProductSupplierInfo).where(ProductSupplierInfo.id_supplier == supplier_id)
         return list(db.session.scalars(stmt))
 
     def get_by_price_between(self, low_end: Decimal, high_end: Decimal) -> list[ProductSupplierInfo] | None:

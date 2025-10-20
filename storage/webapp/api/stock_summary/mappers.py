@@ -7,9 +7,7 @@ from webapp.api.stock_summary.schemas import (
 )
 from webapp.services.stock.dtos import StockSummaryDTO, StockSummaryInboundUpdateDTO
 
-
-
-
+from webapp.services.stock.dtos import StockDTO
 
 
 def to_schema_read_summary_stock(dto: StockSummaryDTO) -> StockResponseSchema:
@@ -29,10 +27,10 @@ def to_schema_read_summary_stock(dto: StockSummaryDTO) -> StockResponseSchema:
 
 
 
-def to_schema_stock_update_response(stock: list[StockSummary]) -> StockUpdateResponseSchema:
+def to_schema_stock_update_response(stock: StockDTO) -> StockUpdateResponseSchema:
     return StockUpdateResponseSchema(
-        warehouse_id=stock[0].warehouse_id,
-        rows_number=len(stock)
+        warehouse_id=stock.warehouse_id,
+        rows_number=stock.qty_added_products
     )
 
 def to_schema_dto_inb_qty_update(dto: StockSummaryInboundUpdateDTO) -> StockUpdateInboundQtyResponseSchema:

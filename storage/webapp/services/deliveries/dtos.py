@@ -29,7 +29,6 @@ class ReadInboundOrderDTO:
     inbound_order_id: int
     warehouse_id: int
     supplier_id: int
-    products: list["ReadInboundOrderProductDTO"]
     status: str
 
 

@@ -1,6 +1,8 @@
+from itertools import product
+
 from webapp.database.models.inbound_orders import InboundOrder
 
-from .dtos import ReadInboundOrderDTO, ReadInboundOrderProductsWithOrderDTO
+from .dtos import ReadInboundOrderDTO, ReadInboundOrderProductsWithOrderDTO, ReadInboundOrderProductDTO
 
 
 def inbound_order_to_dto(order: InboundOrder) -> ReadInboundOrderDTO:
@@ -8,9 +10,9 @@ def inbound_order_to_dto(order: InboundOrder) -> ReadInboundOrderDTO:
         inbound_order_id=order.id,
         warehouse_id=order.warehouse_id,
         supplier_id=order.supplier_id,
-        products=list(order.products),
         status=order.status.value
     )
+
 
 def inbound_orders_with_products_to_dto(orders: list[dict]) -> list[ReadInboundOrderProductsWithOrderDTO]:
     results = []

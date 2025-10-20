@@ -17,9 +17,6 @@ class StocksWithExpDateRepository(GenericRepository[StockWithExpDate]):
 
 # ------------------------ Filtry ------------------------
 
-    # def get_by_sku(self, sku: str) -> list[StockWithExpDate] | None:
-    #     stmt = select(StockWithExpDate).where(StockWithExpDate.Product.sku == sku)
-    #     return list(db.session.scalars(stmt))
     def get_by_sku(self, sku: str) -> list[StockWithExpDate] | None:
         stmt = (
             select(StockWithExpDate)
@@ -53,23 +50,16 @@ class StocksWithExpDateRepository(GenericRepository[StockWithExpDate]):
             StockWithExpDateArch(
                 warehouse_id=rec.warehouse_id,
                 product_id=rec.product_id,
-                good_date_qty=rec.good_date_qty,
-                medium_date_qty=rec.medium_date_qty,
-                critical_date_qty=rec.critical_date_qty,
-                expired_qty=rec.expired_qty,
+                expiration_date=rec.expiration_date,
+                qty_per_exp_date=rec.qty_per_exp_date,
                 qty_total_of_sku=rec.qty_total_of_sku,
-                ordered_in_qty=rec.ordered_in_qty,
-                status_of_total_qty=rec.status_of_total_qty,
-                created_at=rec.created_at,
-                updated_at=rec.updated_at
+                status_of_exp_date=rec.status_of_exp_date,
+                status_of_total_qty=rec.status_of_total_qty
             ) for rec in data_to_archive
         ]
 
         self.arch_repo.add_many(new_archive_models)
-
-        delete_stmt = delete(StockWithExpDate).where(StockWithExpDate.id.in_([rec.id for rec in new_archive_models]))
-        db.session.execute(delete_stmt)
-
+        self.delete_all()
 
 
     # TODO: pochylić się nad tym i zrobic klasę abstrakcyjną, po ktorej będa również dziedziczyć tak by

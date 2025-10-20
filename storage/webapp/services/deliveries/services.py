@@ -121,15 +121,28 @@ class InboundOrderService:
 
         with db.session.begin():
             order = self._ensure_order(dto.order_id)
-            for product in order.products:
-                if product.product_sku == dto.sku:
-                    old_qty = product.qty
-                    self.inbound_orders_repo.edit_qty(product, dto.qty)
+            if not order:
+                raise NotFoundDataException(f'Order {dto.order_id} not found')
+            # order = 0
+            # for product in order.products:
+            #     if product.product_sku == dto.sku:
+            #         old_qty = product.qty
 
-                    print(f"Product {dto.sku} updated from old qty = {old_qty} to new qty = {dto.qty}")
-                    return inbound_order_to_dto(order)
-            else:
-                raise NotFoundDataException(f'Product {dto.sku} not found in order {dto.order_id}')
+            self.inbound_orders_repo.edit_qty(dto.order_id, dto.sku, dto.qty)
+
+            self.stock_service.update_stock_summary_inbound_order_qty(order.warehouse_id)
+            print(f"Product {dto.sku} updated to new qty = {dto.qty}")
+
+
+
+        self.stock_service.update_stock_summary_inbound_order_qty(order.warehouse_id)
+        db.session.commit()  # Zapisz zmiany w stocks_summary
+        # Odśwież obiekt order, żeby mieć aktualne dane po commitach
+        db.session.refresh(order)
+
+        return inbound_order_to_dto(order)
+
+
 
 
 
