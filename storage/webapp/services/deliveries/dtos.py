@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Literal
+from typing import Literal, List, Optional
+
 
 @dataclass(frozen=True)
 class CreateInboundOrderDTO:
@@ -70,3 +71,20 @@ class ReadInboundOrderProductsWithOrderDTO:
     supplier_name: str
     status: str
     warehouse_id: int
+
+
+
+@dataclass(frozen=True)
+class ReadInboundOrderProductInfoDTO:
+    inbound_order_product_id: int
+    product_id: int
+    product_qty: int
+    sku: Optional[str] = None
+
+@dataclass(frozen=True)
+class ReadInboundOrderProductsWithOrderDTO:
+    inbound_order_id: int
+    warehouse_id: int
+    supplier_name: Optional[str]
+    status: str
+    products: List[ReadInboundOrderProductInfoDTO] = None

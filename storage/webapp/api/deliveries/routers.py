@@ -29,6 +29,8 @@ from webapp.services.deliveries.services import InboundOrderService
 
 from webapp.containers import Container
 from . import order_inbound_bp
+from ...database.models.inbound_orders import InboundOrderStatus
+from ...services.deliveries.dtos import ReadInboundOrderProductsWithOrderDTO
 
 
 # ----------------------------------------- Create / Modify Order Inbound -----------------------------------------
@@ -102,13 +104,25 @@ def delete_product_in_order(
 
 @order_inbound_bp.get("/all")
 @inject
-def get_all_orders_with_products(inbound_order_service: InboundOrderService = Provide[Container.inbound_order_service]) -> ResponseReturnValue:
-
+def get_all_orders_with_products(
+    inbound_order_service: InboundOrderService = Provide[Container.inbound_order_service]
+):
     warehouse_id = request.args.get("warehouse_id", type=int)
     statuses = request.args.getlist("statuses") or None
 
-    stock_action = inbound_order_service.get_all_orders_with_products(warehouse_id, statuses or None)
-    return jsonify([to_schema_dto_inbound_order_with_products(schema).model_dump(mode='json') for schema in stock_action])
+    # konwersja stringów na enum
+    converted_statuses = [InboundOrderStatus(s) for s in statuses] if statuses else None
+
+    # pobranie DTO
+    stock_action: list[ReadInboundOrderProductsWithOrderDTO] = inbound_order_service.get_all_orders_with_products(
+        warehouse_id,
+        converted_statuses
+    )
+
+    # mapowanie na schema
+    response_data = [(to_schema_dto_inbound_order_with_products(dto).model_dump(mode='json')) for dto in stock_action]
+
+    return jsonify(response_data)
 
 # Do tego mozna ale nei trzeba wpisywac argumentow i tak URL'e beda wygladac:
 """

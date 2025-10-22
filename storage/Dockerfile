@@ -49,7 +49,6 @@ WORKDIR /app
 # Kopiuje pliki konfiguracyjne Poetry do kontenera. Potrzebne po to by Docker mógł zbudować szybko obraz
 COPY pyproject.toml poetry.lock* ./
 
-
 # Instaluje wszystkie zależności projektu w systemoym Pythonie kontenera (bez wirtualnego środowiska)
 # Only mian -> bez pakeitu dev
 # --no-interaction --no-ansi --no-root → ciche, bez kolorów i bez instalowania samego projektu jako pakietu

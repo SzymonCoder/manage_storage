@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 from sqlalchemy import select
 
 from .generic import GenericRepository
@@ -83,6 +85,8 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
                 return qty
         return 0
 
+
+
     def get_inbound_order_with_products(
             self,
             order_id: int,
@@ -90,73 +94,48 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
         stmt = select(InboundOrderProduct).where(InboundOrderProduct.inbound_order_id == order_id)
         return db.session.scalars(stmt)
 
-
-
     def get_inbound_orders_with_products(
-            self,
-            warehouse_id: int | None = None,
-            statuses: list[InboundOrderStatus] | None = None
-    ) -> list[dict]:
-        """
-        Zwraca listę produktów z zamówień przychodzących wraz z informacjami o zamówieniu.
-        Można filtrować po magazynie (warehouse_id) i statusie (pojedynczym lub wielu).
+        self,
+        warehouse_id: Optional[int] = None,
+        statuses: Optional[List[InboundOrderStatus]] = None
+    ) -> List[dict]:
 
-        - Jeśli `warehouse_id` = None → zwraca wszystkie magazyny.
-        - Jeśli `statuses` = None → zwraca tylko aktywne (czyli wszystko oprócz CANCELLED i DRAFT).
-        """
-
-        # Domyślnie tylko aktywne zamówienia
-        # active_statuses = [
-        #     status for status in InboundOrderStatus
-        #     if status not in (InboundOrderStatus.CANCELLED, InboundOrderStatus.CREATED)
-        # ]
-
-        active_statuses = [
-            status for status in InboundOrderStatus
-            if status.name not in ("CANCELLED", "CREATED")
-        ]
-
+        active_statuses = [s for s in InboundOrderStatus if s.name not in ("CANCELLED", "CREATED")]
         selected_statuses = statuses or active_statuses
 
         stmt = (
             select(
-                InboundOrderProduct.id.label("inbound_order_product_id"),
-                InboundOrderProduct.inbound_order_id,
-                InboundOrderProduct.product_id,
-                InboundOrderProduct.quantity.label("product_qty"),
+                InboundOrder.id.label("inbound_order_id"),
+                InboundOrder.status.label("status"),
+                InboundOrder.warehouse_id.label("warehouse_id"),
+                InboundOrder.created_at.label("created_at"),
                 Supplier.name.label("supplier_name"),
-                InboundOrder.status,
-                InboundOrder.warehouse_id,
-                InboundOrder.created_at,
-                Product.sku
+                InboundOrderProduct.id.label("inbound_order_product_id"),
+                InboundOrderProduct.product_id.label("product_id"),
+                InboundOrderProduct.quantity.label("product_qty"),
+                Product.sku.label("sku")
             )
-            .join(InboundOrder, InboundOrder.id == InboundOrderProduct.inbound_order_id)
-            .join(Product, InboundOrderProduct.product_id == Product.id)
+            .select_from(InboundOrder)
+            .join(InboundOrderProduct, InboundOrderProduct.inbound_order_id == InboundOrder.id, isouter=True)
+            .join(Product, InboundOrderProduct.product_id == Product.id, isouter=True)
+            .join(Supplier, Supplier.id == InboundOrder.supplier_id, isouter=True)
             .where(InboundOrder.status.in_(selected_statuses))
         )
 
-        # Opcjonalny filtr po magazynie
         if warehouse_id is not None:
             stmt = stmt.where(InboundOrder.warehouse_id == warehouse_id)
 
         stmt = stmt.order_by(InboundOrder.id)
+        result = db.session.execute(stmt).all()
 
-        result = db.session.execute(stmt)
+        orders_list = []
+        for row in result:
+            orders_list.append(dict(row._mapping))
+        return orders_list
 
-        return [
-            {
-                "inbound_order_product_id": row.inbound_order_product_id,
-                "inbound_order_id": row.inbound_order_id,
-                "product_id": row.product_id,
-                "product_qty": row.product_qty,
-                "supplier_name": row.supplier_name,
-                "status": row.status,
-                "warehouse_id": row.warehouse_id,
-                "created_at": row.created_at,
-                "sku": row.sku
-            }
-            for row in result
-        ]
+
+
+
 
     def _get_product_id_by_sku(self, sku: str) -> int | None:
         stmt = select(Product.id).where(Product.sku == sku)

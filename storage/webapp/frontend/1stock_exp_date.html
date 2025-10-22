@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stany Magazynowe z Datami | Magazyn PRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+<div class="flex h-screen">
+    <!-- Panel boczny -->
+    <aside class="w-64 bg-white shadow-md flex flex-col">
+        <div class="p-6 border-b">
+            <h1 class="text-2xl font-bold text-blue-600">Magazyn PRO</h1>
+        </div>
+        <nav class="mt-4 flex-1">
+            <a href="deliveries.html" class="nav-link"><i class="fas fa-truck-loading mr-3"></i>Dostawy</a>
+            <a href="stock_summary.html" class="nav-link"><i class="fas fa-boxes mr-3"></i>Stany Magazynowe</a>
+            <a href="1stock_exp_date.html" class="nav-link active"><i class="fas fa-calendar-alt mr-3"></i>Stany z Datami</a>
+        </nav>
+    </aside>
+
+    <!-- Główna treść -->
+    <div class="flex-1 p-4 sm:p-8 overflow-y-auto">
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Stany Magazynowe z Datami Ważności</h1>
+            <button id="refresh-stock-btn" class="btn-primary flex items-center mt-4 sm:mt-0">
+                <i class="fas fa-sync-alt mr-2"></i> Odśwież dane
+            </button>
+        </header>
+
+        <!-- Filtry -->
+        <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-lg font-semibold text-gray-700">Filtry</h2>
+                <button id="reset-filters-btn" class="btn-reset">
+                    <i class="fas fa-times-circle mr-1"></i> Resetuj
+                </button>
+            </div>
+
+            <form id="filters-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label for="warehouseId" class="form-label">ID Magazynu</label>
+                    <input type="number" id="warehouseId" class="form-input" placeholder="np. 1">
+                </div>
+                <div>
+                    <label for="sku" class="form-label">SKU Produktu</label>
+                    <input type="text" id="sku" class="form-input" placeholder="np. PROD-001">
+                </div>
+                <div>
+                    <label for="qtyStatus" class="form-label">Status Ilości</label>
+                    <select id="qtyStatus" class="form-input">
+                        <option value="">Wszystkie</option>
+                        <option value="GOOD">GOOD</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="CRITICAL">CRITICAL</option>
+                        <option value="TOO_LOW">TOO_LOW</option>
+                        <option value="EMPTY">EMPTY</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button id="apply-filters-btn" type="button" class="btn-primary w-full">
+                        <i class="fas fa-filter mr-2"></i> Filtruj
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabela -->
+        <main id="stock-table-container" class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="min-w-full text-sm text-left text-gray-600">
+                <thead class="bg-blue-600 text-white text-sm uppercase">
+                    <tr>
+                        <th class="px-4 py-3">Magazyn</th>
+                        <th class="px-4 py-3">SKU</th>
+                        <th class="px-4 py-3">Data ważności</th>
+                        <th class="px-4 py-3">Ilość (data)</th>
+                        <th class="px-4 py-3">Ilość całkowita</th>
+                        <th class="px-4 py-3">Status daty</th>
+                        <th class="px-4 py-3">Status ilości</th>
+                    </tr>
+                </thead>
+                <tbody id="stock-table-body"></tbody>
+            </table>
+        </main>
+
+        <div id="loader" class="text-center py-10 hidden">
+            <div class="spinner"></div>
+            <p class="mt-2 text-gray-500">Ładowanie danych...</p>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="/js/stock_exp_date.js"></script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Zarządzania Magazynem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Panel Boczny (Nawigacja) -->
+        <aside class="w-64 bg-white shadow-md flex flex-col">
+            <div class="p-6 border-b">
+                <h1 class="text-2xl font-bold text-blue-600">Magazyn PRO</h1>
+            </div>
+            <nav id="main-nav" class="mt-4 flex-1">
+                <a href="#" class="nav-link" data-page="deliveries">
+                    <i class="fas fa-truck-loading fa-fw mr-3"></i>Dostawy
+                </a>
+                <a href="#" class="nav-link" data-page="stock-summary">
+                    <i class="fas fa-boxes fa-fw mr-3"></i>Stany Magazynowe
+                </a>
+                <a href="#" class="nav-link" data-page="stock-exp-date">
+                    <i class="fas fa-calendar-alt fa-fw mr-3"></i>Stany z Datami
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Główna Treść (dynamicznie przełączana) -->
+        <div class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            <!-- === STRONA: DOSTAWY === -->
+            <div id="deliveries-page" class="page-container hidden">
+                <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">Dostawy Przychodzące</h1>
+                    <button id="show-create-order-modal-btn" class="mt-4 sm:mt-0 btn-primary flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Nowe Zamówienie
+                    </button>
+                </header>
+                <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-semibold text-gray-700">Filtry Dostaw</h2>
+                        <button id="reset-deliveries-filters-btn" class="btn-reset">
+                            <i class="fas fa-times-circle mr-1"></i> Resetuj
+                        </button>
+                    </div>
+                    <form id="deliveries-filters-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="deliveries-filter-warehouse-id" class="form-label">ID Magazynu</label>
+                            <input type="number" id="deliveries-filter-warehouse-id" name="warehouse_id" class="form-input" placeholder="np. 1">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="form-label">Statusy</label>
+                            <div id="status-filter-container" class="mt-2 flex flex-wrap gap-x-4 gap-y-2"></div>
+                        </div>
+                    </form>
+                </div>
+                <main id="orders-container" class="space-y-6"></main>
+            </div>
+
+            <!-- === STRONA: STANY MAGAZYNOWE === -->
+            <div id="stock-summary-page" class="page-container hidden">
+                <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">Podsumowanie Stanów Magazynowych</h1>
+                    <div class="flex gap-2 mt-4 sm:mt-0">
+                        <button id="update-inbound-qty-btn" class="btn-secondary flex items-center" title="Aktualizuje pole 'W dostawie' na podstawie zatwierdzonych zamówień">
+                            <i class="fas fa-sync-alt mr-2"></i> Akt. Ilości w Dostawach
+                        </button>
+                        <button id="update-stock-btn" class="btn-primary flex items-center" title="Przelicza daty ważności i stany produktów">
+                            <i class="fas fa-cogs mr-2"></i> Akt. Stany Magazynowe
+                        </button>
+                    </div>
+                </header>
+                <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+                     <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-semibold text-gray-700">Filtry Stanów</h2>
+                        <button id="reset-stock-filters-btn" class="btn-reset">
+                            <i class="fas fa-times-circle mr-1"></i> Resetuj
+                        </button>
+                    </div>
+                    <form id="stock-filters-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                             <label for="stock-filter-warehouse-id" class="form-label">ID Magazynu</label>
+                             <input type="number" id="stock-filter-warehouse-id" name="warehouse_id" class="form-input" placeholder="Filtruj wg magazynu">
+                        </div>
+                        <div>
+                             <label for="stock-filter-sku" class="form-label">SKU Produktu</label>
+                             <input type="text" id="stock-filter-sku" name="sku" class="form-input" placeholder="np. PROD-001">
+                        </div>
+                        <div>
+                             <label for="stock-filter-status" class="form-label">Status Ilości</label>
+                             <select id="stock-filter-status" name="status_of_total_qty" class="form-input">
+                                 <option value="">Wszystkie</option>
+                                 <option value="GOOD">GOOD</option>
+                                 <option value="MEDIUM">MEDIUM</option>
+                                 <option value="CRITICAL">CRITICAL</option>
+                                 <option value="TOO_LOW">TOO_LOW</option>
+                                 <option value="EMPTY">EMPTY</option>
+                             </select>
+                        </div>
+                    </form>
+                </div>
+                <main id="stock-summary-container" class="bg-white rounded-lg shadow-md overflow-hidden"></main>
+            </div>
+
+            <!-- === STRONA: STANY Z DATAMI WAŻNOŚCI === -->
+            <div id="stock-exp-date-page" class="page-container hidden">
+                <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">Stany z Datami Ważności</h1>
+                    <div class="flex gap-2 mt-4 sm:mt-0">
+                        <button id="update-stock-exp-date-btn" class="btn-primary flex items-center" title="Przelicza daty ważności produktów">
+                            <i class="fas fa-cogs mr-2"></i> Akt. Stany z Datami
+                        </button>
+                    </div>
+                </header>
+                <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+                     <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-semibold text-gray-700">Filtry</h2>
+                        <button id="reset-stock-exp-filters-btn" class="btn-reset">
+                            <i class="fas fa-times-circle mr-1"></i> Resetuj
+                        </button>
+                    </div>
+                    <form id="stock-exp-filters-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                             <label for="stock-exp-filter-warehouse-id" class="form-label">ID Magazynu</label>
+                             <input type="number" id="stock-exp-filter-warehouse-id" name="warehouse_id" class="form-input" placeholder="Filtruj wg magazynu">
+                        </div>
+                        <div>
+                             <label for="stock-exp-filter-sku" class="form-label">SKU Produktu</label>
+                             <input type="text" id="stock-exp-filter-sku" name="sku" class="form-input" placeholder="np. PROD-001">
+                        </div>
+                        <div>
+                             <label for="stock-exp-filter-exp-date" class="form-label">Data Ważności</label>
+                             <input type="date" id="stock-exp-filter-exp-date" name="exp_date" class="form-input">
+                        </div>
+                    </form>
+                </div>
+                <main id="stock-exp-container" class="bg-white rounded-lg shadow-md overflow-hidden"></main>
+            </div>
+
+            <div id="loader" class="text-center py-10 hidden">
+                <div class="spinner"></div>
+                <p class="mt-2 text-gray-500">Ładowanie danych...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="create-order-modal" class="modal hidden">
+        <div class="modal-content"><h3 class="text-xl font-semibold mb-4">Utwórz Nowe Zamówienie</h3><form id="create-order-form"><div class="mb-4"><label for="warehouse_id" class="form-label">ID Magazynu</label><input type="number" id="warehouse_id" name="warehouse_id" required class="form-input"></div><div class="mb-4"><label for="supplier_id" class="form-label">ID Dostawcy</label><input type="number" id="supplier_id" name="supplier_id" required class="form-input"></div><div class="modal-actions"><button type="button" data-action="close-modal" class="btn-secondary">Anuluj</button><button type="submit" class="btn-primary">Utwórz</button></div></form></div>
+    </div>
+    <div id="add-product-modal" class="modal hidden">
+        <div class="modal-content"><h3 class="text-xl font-semibold mb-4">Dodaj Produkt do Zamówienia</h3><form id="add-product-form"><input type="hidden" name="order_id" id="add-product-order-id"><div class="mb-4"><label for="product_sku" class="form-label">SKU Produktu</label><input type="text" id="product_sku" name="product_sku" required class="form-input"></div><div class="mb-4"><label for="qty" class="form-label">Ilość</label><input type="number" id="qty" name="qty" required min="1" class="form-input"></div><div class="modal-actions"><button type="button" data-action="close-modal" class="btn-secondary">Anuluj</button><button type="submit" class="btn-primary">Dodaj</button></div></form></div>
+    </div>
+
+    <!-- ✅ POPRAWIONE: Załaduj skrypty jako moduły ES6 -->
+    <script type="module" src="/js/api.js"></script>
+    <script type="module" src="/js/layout.js"></script>
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html>

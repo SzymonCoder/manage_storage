@@ -1,6 +1,8 @@
 #tutaj operacje usera co moze robic np. dodac produkt do bazy danych, albo admin usunac z bazy danych,
 # fajnie byloby jeszcze zrobic zamowienie z produktow, ktore maja krotka date waznosci albo sa na wyczerpaniu
 # stworzenie zamowienia i ustawianie statusow (nie ma wplywu na stan magazynowy
+from typing import Optional, List
+
 from webapp.database.repositories.external_stock_repository import ExternalStockRepository
 from webapp.database.repositories.inbound_order_product import InboundOrderProductRepository
 from webapp.database.repositories.inbound_orders import InboundOrderRepository
@@ -29,7 +31,8 @@ from webapp.services.extension import (
     ValidationException,
 )
 
-from .mappers import inbound_order_to_dto, inbound_orders_with_products_to_dto
+from .dtos import ReadInboundOrderProductInfoDTO
+from .mappers import inbound_order_to_dto, inbound_orders_with_products_to_dto, inbound_orders_to_dto
 from ..stock.service import StockService
 from ...database.models.inbound_orders import InboundOrder, InboundOrderProduct, InboundOrderStatus
 from ...database.models.products import Product
@@ -186,20 +189,41 @@ class InboundOrderService:
 
 
     def get_all_orders_with_products(
-            self,
-            warehouse_id: int | None = None,
-            statuses: list[str] | None = None
-    ) -> list[ReadInboundOrderProductsWithOrderDTO]:
+        self,
+        warehouse_id: Optional[int] = None,
+        statuses: Optional[List[InboundOrderStatus]] = None
+    ) -> List[ReadInboundOrderProductsWithOrderDTO]:
 
-        converted_statuses = []
-        if statuses:
-            for status in statuses:
-                converted_statuses.append(InboundOrderStatus(status))
+        objects = self.inbound_orders_repo.get_inbound_orders_with_products(
+            warehouse_id,
+            statuses
+        )
+        return self._map_orders_to_dto(objects)
 
-        objects = self.inbound_orders_repo.get_inbound_orders_with_products(warehouse_id, converted_statuses)
-        return inbound_orders_with_products_to_dto(objects)
+    def _map_orders_to_dto(self, orders: List[dict]) -> List[ReadInboundOrderProductsWithOrderDTO]:
+        orders_dict = {}
 
+        for row in orders:
+            order_id = row["inbound_order_id"]
+            if order_id not in orders_dict:
+                orders_dict[order_id] = ReadInboundOrderProductsWithOrderDTO(
+                    inbound_order_id=order_id,
+                    warehouse_id=row["warehouse_id"],
+                    supplier_name=row.get("supplier_name"),
+                    status=row["status"],
+                    products=[]
+                )
 
+            if row.get("inbound_order_product_id") is not None:
+                product_dto = ReadInboundOrderProductInfoDTO(
+                    inbound_order_product_id=row["inbound_order_product_id"],
+                    product_id=row["product_id"],
+                    product_qty=row["product_qty"],
+                    sku=row.get("sku")
+                )
+                orders_dict[order_id].products.append(product_dto)
+
+        return list(orders_dict.values())
 
 
 

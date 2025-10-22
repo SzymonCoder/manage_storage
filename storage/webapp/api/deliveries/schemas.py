@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Literal
+from typing import Literal, Optional, List
 
 from webapp.services.deliveries.dtos import ReadInboundOrderProductDTO
 
@@ -44,13 +44,29 @@ class InboundOrderResponseSchema(BaseModel):
     status: str
 
 
-class ReadInboundOrderProductsWithOrderSchema(BaseModel):
-    warehouse_id: int
-    inbound_order_id: int
+# class ReadInboundOrderProductsWithOrderSchema(BaseModel):
+#     warehouse_id: int
+#     inbound_order_id: int
+#     inbound_order_product_id: int
+#     product_id: int
+#     product_qty: int
+#     supplier_name: str
+#     status: str
+#
+
+
+class ReadInboundOrderProductInfoSchema(BaseModel):
     inbound_order_product_id: int
     product_id: int
     product_qty: int
-    supplier_name: str
+    sku: Optional[str] = None
+
+
+class ReadInboundOrderProductsWithOrderSchema(BaseModel):
+    inbound_order_id: int
+    warehouse_id: int
+    supplier_name: Optional[str]
     status: str
+    products: List[ReadInboundOrderProductInfoSchema]
 
 

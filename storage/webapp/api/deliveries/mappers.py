@@ -5,7 +5,7 @@ from .schemas import (
     SetInboundOrderStatusSchema,
     UpdateQtySkuInboundOrderSchema,
     DeleteInboundOrderProductSchema,
-    ReadInboundOrderProductsWithOrderSchema, DeleteInboundOrderSchema
+    ReadInboundOrderProductsWithOrderSchema, DeleteInboundOrderSchema, ReadInboundOrderProductInfoSchema
 
 )
 from ...services.deliveries.dtos import (
@@ -71,14 +71,33 @@ def to_dto_delete_order_product(schema: DeleteInboundOrderProductSchema) -> Dele
     )
 
 
+# def to_schema_dto_inbound_order_with_products(dto: ReadInboundOrderProductsWithOrderDTO) -> ReadInboundOrderProductsWithOrderSchema:
+#     return ReadInboundOrderProductsWithOrderSchema(
+#             warehouse_id=dto.warehouse_id,
+#             inbound_order_id=dto.inbound_order_id,
+#             inbound_order_product_id=dto.inbound_order_product_id,
+#             product_id=dto.product_id,
+#             product_qty=dto.product_qty,
+#             supplier_name=dto.supplier_name,
+#             status=dto.status
+#             )
+
 def to_schema_dto_inbound_order_with_products(dto: ReadInboundOrderProductsWithOrderDTO) -> ReadInboundOrderProductsWithOrderSchema:
+    """
+    Mapuje DTO na Pydantic Schema lub dataclass.
+    """
     return ReadInboundOrderProductsWithOrderSchema(
-            warehouse_id=dto.warehouse_id,
-            inbound_order_id=dto.inbound_order_id,
-            inbound_order_product_id=dto.inbound_order_product_id,
-            product_id=dto.product_id,
-            product_qty=dto.product_qty,
-            supplier_name=dto.supplier_name,
-            status=dto.status
-            )
+        inbound_order_id=dto.inbound_order_id,
+        warehouse_id=dto.warehouse_id,
+        supplier_name=dto.supplier_name,
+        status=dto.status,
+        products=[
+            ReadInboundOrderProductInfoSchema(
+                inbound_order_product_id=prod.inbound_order_product_id,
+                product_id=prod.product_id,
+                product_qty=prod.product_qty,
+                sku=prod.sku
+            ) for prod in (dto.products or [])
+        ]
+    )
 

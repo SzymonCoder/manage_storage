@@ -1,4 +1,6 @@
-from flask import Flask, current_app, send_from_directory
+import os
+
+from flask import current_app, send_from_directory, Flask
 
 from . import database
 from .api import api_bp
@@ -31,9 +33,22 @@ def create_app() -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
 
+    frontend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'frontend')
+
+    print(f"Frontend directory: {frontend_dir}")
+    print(f"Index.html exists: {os.path.exists(os.path.join(frontend_dir, 'index.html'))}")
+
     @app.route('/')
     def index():
-        return send_from_directory('static', 'index.html')
+        return send_from_directory(frontend_dir, 'index.html')
+
+    @app.route('/<path:filename>')
+    def static_pages(filename):
+        # Nie obsługuj endpointów API
+        if filename.startswith('api/'):
+            from flask import abort
+            abort(404)
+        return send_from_directory(frontend_dir, filename)
 
 
     # Uruchamia "kontekst aplikacji" Flaska, co pozwala bezpiecznie korzystać z funkcji zależnych od aplikacji,
@@ -61,5 +76,3 @@ def create_app() -> Flask:
         app.logger.info(f'WEB APP EXTENSTIONS: {current_app.extensions}')
 
     return app
-
-

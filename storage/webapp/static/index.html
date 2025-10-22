@@ -774,6 +774,18 @@
                         <label class="form-label">Warehouse ID (opcjonalne)</label>
                         <input type="number" class="form-control" id="filter-warehouse" placeholder="Wszystkie magazyny">
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Filtruj po statusach (opcjonalnie)</label>
+                        <div id="filter-statuses">
+                            <label><input type="checkbox" value="created"> Utworzone</label>
+                            <label><input type="checkbox" value="approved"> Zatwierdzone</label>
+                            <label><input type="checkbox" value="produced"> Wyprodukowane</label>
+                            <label><input type="checkbox" value="in_transit"> W transporcie</label>
+                            <label><input type="checkbox" value="delivered"> Dostarczone</label>
+                            <label><input type="checkbox" value="completed"> Zakończone</label>
+                            <label><input type="checkbox" value="cancelled"> Anulowane</label>
+                        </div>
+                    </div>
                     <button type="submit" class="btn btn-primary btn-block">
                         <i class="fas fa-download"></i> Pobierz zamówienia
                     </button>
@@ -897,7 +909,7 @@
     </div>
 
     <script>
-        const API_BASE = '/api';
+        const API_BASE = 'http://localhost:5000/api';
 
         // Tab Switching
         function switchTab(tabName, element) {
@@ -1011,7 +1023,7 @@
 
                 html += `
                     <tr>
-                        <td><strong>#${order.id}</strong></td>
+                        <td><strong>#${order.inbound_order_id}</strong></td>
                         <td>Magazyn ${order.warehouse_id}</td>
                         <td>Dostawca ${order.supplier_id}</td>
                         <td>${getStatusBadge(order.status)}</td>
@@ -1209,11 +1221,23 @@
 
                 // Render appropriate table based on data structure
                 if (containerId === 'orders-response') {
-                    html += renderOrdersTable(Array.isArray(data) ? data : [data]);
+                    if (data.orders) {
+                        html += renderOrdersTable(data.orders);
+                    } else {
+                        html += renderOrdersTable(Array.isArray(data) ? data : [data]);
+                    }
                 } else if (containerId === 'stock-response') {
-                    html += renderStockTable(Array.isArray(data) ? data : [data]);
+                    if (data.stock) {
+                        html += renderStockTable(data.stock);
+                    } else {
+                        html += renderStockTable(Array.isArray(data) ? data : [data]);
+                    }
                 } else if (containerId === 'expiry-response') {
-                    html += renderExpiryTable(Array.isArray(data) ? data : [data]);
+                    if (data.expiry) {
+                        html += renderExpiryTable(data.expiry);
+                    } else {
+                        html += renderExpiryTable(Array.isArray(data) ? data : [data]);
+                    }
                 }
 
                 container.innerHTML = html;
@@ -1227,20 +1251,24 @@
                     method,
                     headers: { 'Content-Type': 'application/json' }
                 };
-
                 if (body) {
                     options.body = JSON.stringify(body);
                 }
 
                 const response = await fetch(url, options);
-                const data = await response.json();
+                const text = await response.text();
+                let data;
+
+                try {
+                    data = text ? JSON.parse(text) : {};
+                } catch (e) {
+                    data = { error: text || 'Nie udało się sparsować odpowiedzi' };
+                }
 
                 return { data, ok: response.ok };
             } catch (error) {
-                return {
-                    data: { error: error.message || 'Błąd połączenia z serwerem' },
-                    ok: false
-                };
+                console.error('Błąd fetch:', error);
+                return { data: { error: error.message || 'Błąd połączenia z serwerem' }, ok: false };
             }
         }
 
@@ -1252,7 +1280,9 @@
                 supplier_id: parseInt(document.getElementById('create-supplier').value)
             };
 
-            const { data, ok } = await apiCall(`${API_BASE}/deliveries/create_order`, 'POST', body);
+            console.log('Wysyłane dane:', body);
+
+            const { data, ok } = await apiCall(`${API_BASE}/order_inbound/create_order`, 'POST', body);
             showResponse('orders-response', data, !ok);
 
             if (ok) {
@@ -1270,7 +1300,7 @@
                 qty: parseInt(document.getElementById('add-qty').value)
             };
 
-            const { data, ok } = await apiCall(`${API_BASE}/deliveries/add_product_to_order`, 'POST', body);
+            const { data, ok } = await apiCall(`${API_BASE}/order_inbound/add_product_to_order`, 'POST', body);
             showResponse('orders-response', data, !ok);
 
             if (ok) {
@@ -1280,22 +1310,33 @@
         }
 
         async function updateStatus(e) {
-            e.preventDefault();
-            const body = {
-                order_id: parseInt(document.getElementById('status-order-id').value),
-                status: document.getElementById('status-value').value
-            };
+        e.preventDefault();
 
-            const { data, ok } = await apiCall(`${API_BASE}/deliveries/update_product_status_in_order`, 'PATCH', body);
-            showResponse('orders-response', data, !ok);
-        }
+        const idValue = document.getElementById('status-order-id').value.trim();
+        const statusValue = document.getElementById('status-value').value.trim();
+
+        if (!idValue || isNaN(Number(idValue))) {
+            showResponse('orders-response', { error: 'Nieprawidłowy numer zamówienia.' }, true);
+            return;
+    }
+
+        const body = {
+            order_id: Number(idValue),
+            status: statusValue
+    };
+
+        console.log('Wysyłane dane:', body);
+
+        const { data, ok } = await apiCall(`${API_BASE}/order_inbound/update_product_status_in_order`, 'PATCH', body);
+        showResponse('orders-response', data, !ok);
+}
 
         async function deleteOrder(e) {
             e.preventDefault();
             if (!confirm('Czy na pewno chcesz usunąć to zamówienie?')) return;
 
             const orderId = document.getElementById('delete-order-id').value;
-            const { data, ok } = await apiCall(`${API_BASE}/deliveries/delete_order/${orderId}`, 'DELETE');
+            const { data, ok } = await apiCall(`${API_BASE}/order_inbound/delete_order/${orderId}`, 'DELETE');
             showResponse('orders-response', data, !ok);
 
             if (ok) {
@@ -1306,9 +1347,22 @@
         async function getAllOrders(e) {
             e.preventDefault();
             const warehouseId = document.getElementById('filter-warehouse').value;
-            const url = warehouseId
-                ? `${API_BASE}/deliveries/all?warehouse_id=${warehouseId}`
-                : `${API_BASE}/deliveries/all`;
+
+            // Pobierz wybrane statusy
+            const statuses = Array.from(document.querySelectorAll('#filter-statuses input[type="checkbox"]:checked'))
+                                    .map(cb => cb.value);
+
+            let url = `${API_BASE}/order_inbound/all`;
+
+            const params = new URLSearchParams();
+            if (warehouseId) params.append('warehouse_id', warehouseId);
+            statuses.forEach(status => params.append('statuses', status));
+
+            if ([...params].length) {
+                url += `?${params.toString()}`;
+            }
+
+            console.log('Pobieranie zamówień z URL:', url); // 👈 dodaj ten log
 
             const { data, ok } = await apiCall(url);
             showResponse('orders-response', data, !ok);
@@ -1338,8 +1392,9 @@
 
         // Expiry Functions
         async function getAllStockExp() {
-            const { data, ok } = await apiCall(`${API_BASE}/stock_exp_date/all`);
-            showResponse('expiry-response', data, !ok);
+        const { data, ok } = await apiCall(`${API_BASE}/stock_exp_date/all`);
+        console.log('getAllStockExp response:', data, 'ok:', ok); // 👈 log
+        showResponse('expiry-response', data, !ok);
         }
 
         async function getStockExpByDateStatus(e) {

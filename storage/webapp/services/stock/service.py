@@ -53,25 +53,32 @@ class StockService:
         self.external_stock_repo = external_stock_repo
         self.product_repo = product_repo
 
-
-
     def update_stock_data(self, warehouse_id: int = 1) -> StockDTO:
+        external_stock = self.prepare_data_for_stock_update(warehouse_id)
+        if not external_stock:
+            raise ServiceException('Problem with import stock_summary and convert data')
 
-        with db.session.begin():
-            external_stock = self.prepare_data_for_stock_update(warehouse_id)
-            if not external_stock:
-                raise ServiceException('Problem with import stock_summary and convert data')
-
+        # ✅ USUŃ with db.session.begin():
+        try:
+            # Archiwizuj stare dane
             self.stocks_summary_repo.transfer_to_archive(warehouse_id)
             self.stocks_with_exp_dates_repo.transfer_to_archive(warehouse_id)
+
+            # Dodaj nowe dane
             self.stocks_summary_repo.add_many(external_stock[0])
             self.stocks_with_exp_dates_repo.add_many(external_stock[1])
 
-        self.update_stock_summary_inbound_order_qty(warehouse_id)
+            # Commit wszystkich zmian naraz
+            db.session.commit()
 
-        return stock_to_dto(external_stock[0])
+            # Aktualizuj ilości z zamówień
+            self.update_stock_summary_inbound_order_qty(warehouse_id)
 
+            return stock_to_dto(external_stock[0])
 
+        except Exception as e:
+            db.session.rollback()
+            raise ServiceException(f'Failed to update stock data: {str(e)}')
 
     def update_stock_summary_inbound_order_qty(self, warehouse_id: int = 1) -> StockSummaryInboundUpdateDTO:
 
@@ -79,28 +86,24 @@ class StockService:
         for record in all_stock_records:
             record.ordered_in_qty = 0
 
-
         ordered_qty_in = self.inbound_orders_repo.get_active_ordered_quantities(warehouse_id)
 
         updated_sku_count = 0
         updated_qty_count = 0
 
-
         for sku, value in ordered_qty_in.items():
             stock_record = self.stocks_summary_repo.get_by_warehouse_id_and_product_sku(warehouse_id, sku)
 
             if stock_record:
-                stock_record.ordered_in_qty = value
+                stock_record.ordered_in_qty += value
                 updated_sku_count += 1
                 updated_qty_count += value
 
-
+        # ✅ DODAJ commit
+        db.session.commit()
 
         print(f'Stock summary updated with inbound orders')
         return stock_summary_inbound_update_to_dto(warehouse_id, updated_sku_count, updated_qty_count)
-
-    def delete_stock_summary_inbound_order_qty(self, warehouse_id: int = 1) -> StockSummaryInboundUpdateDTO:
-        pass
 
 # ------------------------------------ Filtry StockWithExpDate ----------------------------------
 
@@ -338,8 +341,3 @@ class StockService:
 
 
         return product.days_of_dosage
-
-
-
-
-

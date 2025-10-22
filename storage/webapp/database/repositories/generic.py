@@ -1,7 +1,7 @@
 from typing import Iterable, TypeVar
 
 from flask_sqlalchemy.model import Model
-from sqlalchemy import select
+from sqlalchemy import select, delete as sql_delete
 
 from ...extensions import db
 
@@ -30,7 +30,9 @@ class GenericRepository[T: Model]:
             db.session.delete(obj)
 
     def delete_all(self) -> None:
-        return db.session.query(self.model).delete()
+        # ✅ Zmienione: używamy delete() ze SQLAlchemy 2.0 API
+        stmt = sql_delete(self.model)
+        db.session.execute(stmt)
 
     def get(self, pk: int) -> T | None:
         return db.session.get(self.model, pk)
