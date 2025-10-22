@@ -1,4 +1,4 @@
-from flask import Flask, current_app
+from flask import Flask, current_app, send_from_directory
 
 from . import database
 from .api import api_bp
@@ -31,6 +31,10 @@ def create_app() -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
 
+    @app.route('/')
+    def index():
+        return send_from_directory('static', 'index.html')
+
 
     # Uruchamia "kontekst aplikacji" Flaska, co pozwala bezpiecznie korzystać z funkcji zależnych od aplikacji,
     # takich jak 'current_app' czy rozszerzenia (np. baza danych).
@@ -57,3 +61,5 @@ def create_app() -> Flask:
         app.logger.info(f'WEB APP EXTENSTIONS: {current_app.extensions}')
 
     return app
+
+

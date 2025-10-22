@@ -32,15 +32,25 @@ class InboundOrderRepository(GenericRepository[InboundOrder]):
     def edit_product_id(self, order: InboundOrder, product_id: int) -> None:
         order.product_id = product_id
 
-
     def add_product_to_inbound_order(self, order: InboundOrder, product_id: int, qty: int) -> InboundOrderProduct:
-        product = InboundOrderProduct(
+        order_with_products = self.get_inbound_order_with_products(order.id)
+
+        # Szukamy produktu w istniejących pozycjach
+        for product in order_with_products:
+            if product.product_id == product_id:
+                # Nadpisujemy ilość, jeśli produkt już istnieje
+                product.quantity = qty
+                db.session.add(product)
+                return product
+
+        # Jeśli nie znaleziono produktu — dodajemy nowy
+        new_product = InboundOrderProduct(
             inbound_order_id=order.id,
             product_id=product_id,
-            qty=qty
+            quantity=qty
         )
-        db.session.add(product)
-        return product
+        db.session.add(new_product)
+        return new_product
 
 
 

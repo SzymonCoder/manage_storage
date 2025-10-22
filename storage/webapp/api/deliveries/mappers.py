@@ -5,7 +5,7 @@ from .schemas import (
     SetInboundOrderStatusSchema,
     UpdateQtySkuInboundOrderSchema,
     DeleteInboundOrderProductSchema,
-    ReadInboundOrderProductsWithOrderSchema
+    ReadInboundOrderProductsWithOrderSchema, DeleteInboundOrderSchema
 
 )
 from ...services.deliveries.dtos import (
@@ -59,9 +59,9 @@ def to_dto_update_qty_sku(schema: UpdateQtySkuInboundOrderSchema) -> UpdateQtySk
         qty=schema.qty
     )
 
-def to_dto_delete_order(inbound_order_id: int) -> DeleteInboundOrderDTO:
+def to_dto_delete_order(schema: DeleteInboundOrderSchema) -> DeleteInboundOrderDTO:
     return DeleteInboundOrderDTO(
-        inbound_order_id=inbound_order_id
+        inbound_order_id=schema.inbound_order_id
     )
 
 def to_dto_delete_order_product(schema: DeleteInboundOrderProductSchema) -> DeleteInboundOrderProductDTO:

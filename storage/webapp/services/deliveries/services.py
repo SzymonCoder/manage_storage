@@ -72,7 +72,7 @@ class InboundOrderService:
 
 
     def add_inbound_order(self, dto: CreateInboundOrderDTO) -> ReadInboundOrderDTO:
-        with (db.session.begin()):
+        with db.session.begin():
             if not self._check_supplier_active(dto.supplier_id):
                 raise ServiceException('Supplier is not active')
             if not self._check_warehouse_active(dto.warehouse_id):
@@ -88,17 +88,15 @@ class InboundOrderService:
 
         return inbound_order_to_dto(inbound_order)
 
-
     def add_product_to_inbound_order(self, dto: AddProductToInboundOrderDTO) -> ReadInboundOrderDTO:
-
         with db.session.begin():
             inbound_order = self._ensure_order(dto.order_id)
             self._add_item_internal(
                 inbound_order,
-                CreateOrderProductDTO(product_sku=dto.product_sku, quantity=dto.qty))
+                CreateOrderProductDTO(product_sku=dto.product_sku, quantity=dto.qty)
+            )
 
-            return inbound_order_to_dto(inbound_order)
-
+        return inbound_order_to_dto(inbound_order)
 
 
 
@@ -155,7 +153,7 @@ class InboundOrderService:
             elif order.status == InboundOrderStatus.COMPLETED:
                 raise ValidationException(f'Order {dto.inbound_order_id} cannot be deleted due to COMPLETED status')
             else:
-                self.inbound_orders_repo.delete_by_id(order.inbound_order_id)
+                self.inbound_orders_repo.delete_by_id(order.id)
                 print(f"Order {dto.inbound_order_id} deleted")
             return dto.inbound_order_id
 
@@ -213,7 +211,7 @@ class InboundOrderService:
 
     def _check_supplier_active(self, supplier_id: int) -> bool:
         supplier = self.supplier_repo.get_by_id(supplier_id)
-        status = supplier and supplier.is_acctive
+        status = supplier and supplier.is_active
 
         # jesli nie ma suppliers = False, jesli jest to idzie dale
         # i sprawdza is_active, jesli is_active = Fasle, to Fasle, jesli True to True
@@ -249,29 +247,25 @@ class InboundOrderService:
 
         return product
 
+    def _add_item_internal(self, inbound_order: InboundOrder,
+                           product_dto: CreateOrderProductDTO) -> InboundOrderProduct:
 
-
-
-    def _add_item_internal(self, inbound_order: InboundOrder, product_dto: CreateOrderProductDTO) -> InboundOrderProduct:
         product = self._ensure_product(product_dto.product_sku)
 
-        supplier_id = inbound_order.supplier_id
-
-
-        supplier_check = self.supplier_repo.get_by_id(supplier_id) # type: ignore
-
-
-        if supplier_check is None:
+        supplier = self.supplier_repo.get_by_id(inbound_order.supplier_id)
+        if supplier is None:
             raise ServiceException(f'Supplier {inbound_order.supplier_id} does not exist')
+        if not supplier.is_active:
+            raise ServiceException(f'Supplier {inbound_order.supplier_id} is not active')
 
-        if not supplier_check.is_active:
-            raise ServiceException(f'Supplier {inbound_order.supplier_id} does not support this product')
+        # (opcjonalnie) sprawdzenie, czy produkt należy do dostawcy:
+        # if not self.product_supplier_info_repo.exists(product.id, supplier.id):
+        #     raise ValidationException(f'Product {product_dto.product_sku} is not supplied by supplier {supplier.id}')
 
         return self.inbound_orders_repo.add_product_to_inbound_order(
             order=inbound_order,
             product_id=product.id,
             qty=product_dto.quantity
-
         )
 
 

@@ -82,7 +82,7 @@ def delete_order(
         inbound_order_service: InboundOrderService = Provide[Container.inbound_order_service],
 ) -> ResponseReturnValue:
     schema = DeleteInboundOrderSchema(inbound_order_id=inbound_order_id)
-    dto = to_dto_delete_order(schema.inbound_order_id)
+    dto = to_dto_delete_order(schema)
     inbound_order_service.delete_order(dto)
     return jsonify({"message": f"Order {inbound_order_id} deleted successfully"}), 200
 
@@ -95,8 +95,7 @@ def delete_product_in_order(
     payload = DeleteInboundOrderProductSchema.model_validate(request.get_json() or {})
     dto = to_dto_delete_order_product(payload)
     read_dto = inbound_order_service.delete_product_in_order(dto)
-    return jsonify({f'message: Product {read_dto} deleted successfully from inbound order {dto.inbound_order_id}'}), 200
-
+    return jsonify({f"Product {read_dto} deleted successfully from inbound order {dto.inbound_order_id}"}), 200
 
 
 # ----------------------------------------- Filters -----------------------------------------
