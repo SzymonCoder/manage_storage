@@ -77,9 +77,9 @@ function handleStockExpFilterChange() {
 }
 
 async function handleUpdateAction(apiFunction, successMsg, errorMsg) {
-    const whId = document.getElementById('stock-filter-warehouse-id').value || prompt("Akcja wymaga ID magazynu. Proszę podać ID:");
-    if (!whId || isNaN(parseInt(whId))) { if(whId !== null) alert("Podano nieprawidłowe ID magazynu. Operacja anulowana."); return; }
-    if (!confirm(`Czy na pewno chcesz wykonać tę operację dla magazynu #${whId}?`)) { return; }
+    const whId = document.getElementById('stock-filter-warehouse-id').value || prompt("Please put active Warehouse ID::");
+    if (!whId || isNaN(parseInt(whId))) { if(whId !== null) alert("Wrong Warehouse ID. Action cancelled."); return; }
+    if (!confirm(`Are you sure that you want to make this operation for Warehouse #${whId}?`)) { return; }
     try { const result = await apiFunction(whId); alert(successMsg(result)); state.stock.filters.warehouse_id = whId; document.getElementById('stock-filter-warehouse-id').value = whId; loadStockSummary(); }
     catch (error) { alert(`${errorMsg}: ${error.message}`); }
 }
@@ -126,8 +126,8 @@ function initialize() {
     document.getElementById('stock-exp-filters-form')?.addEventListener('input', debouncedStockExpFilterHandler);
     document.getElementById('reset-stock-exp-filters-btn')?.addEventListener('click', () => { document.getElementById('stock-exp-filters-form')?.reset(); handleStockExpFilterChange(); });
 
-    document.getElementById('update-stock-btn').addEventListener('click', () => handleUpdateAction(api.updateStockData, (r) => `Sukces! Zaktualizowano stany magazynowe. Przetworzono: ${r.rows_number} wierszy.`, 'Błąd aktualizacji stanów'));
-    document.getElementById('update-inbound-qty-btn').addEventListener('click', () => handleUpdateAction(api.updateInboundQty, (r) => `Sukces! Zaktualizowano ilości w dostawach. Zaktualizowano ${r.updated_sku_qty} SKU, łączna ilość: ${r.updated_qty}.`, 'Błąd aktualizacji ilości w dostawach'));
+    document.getElementById('update-stock-btn').addEventListener('click', () => handleUpdateAction(api.updateStockData, (r) => `Congrats! Stock updated. Processed: ${r.rows_number} rows.`, 'Error in stock update'));
+    document.getElementById('update-inbound-qty-btn').addEventListener('click', () => handleUpdateAction(api.updateInboundQty, (r) => `Yupi! Updated qty of product in deliveries. Updated ${r.updated_sku_qty} SKU, total qty: ${r.updated_qty}.`, 'Error in inbound qty update'));ok
 
     document.body.addEventListener('click', handleContainerClick);
 

@@ -30,6 +30,71 @@
 
         <!-- Główna Treść (dynamicznie przełączana) -->
         <div class="flex-1 p-4 sm:p-8 overflow-y-auto">
+            <!-- === STRONA: POWITALNA === -->
+            <div id="welcome-page" class="page-container">
+                <div class="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto mt-8">
+                <!-- Nagłówek -->
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">Welcome to the Storage Manager System Demo!</h1>
+                    <!-- Sekcja: O aplikacji -->
+                    <section class="mb-6">
+                        <p class="text-gray-700 text-lg mb-4">
+                            I created this webapp fully in <strong>two weeks</strong>, and for sure this is <strong>not my full potential</strong>.
+                            I am still learning and eager to work on new projects that can be helpful for you.
+                        </p>
+                        <p class="text-gray-700 text-lg mb-4">
+                            I was a <strong>Logistics Manager</strong> at a company providing fulfillment services mainly for e-commerce businesses.
+                            I worked closely with developers and analysts and often noticed communication problems — they did not fully understand warehouse tasks,
+                            so functionalities were not implemented correctly. With my knowledge and experience, I decided to learn coding to provide a full solution — and this is it.
+                            I am good at numbers and analytics, and my strong Excel skills helped me during my coding studies.
+                        </p>
+                    </section>
+
+                    <!-- Sekcja: Cel aplikacji -->
+                    <section class="mb-6">
+                        <p class="text-gray-700 text-lg mb-4">
+                            Now, I want to <strong>provide services</strong> for anyone seeking a reliable partner to solve real problems.
+                            This app is the beginning of what I want to create: the <strong>Storage Manager System</strong>, responsible for tracking stock to avoid situations
+                            where products are unavailable or expired. Losing money is not enjoyable for sellers, so this app will help remind when to order products
+                            and when promotions should be applied due to low expiration dates.
+                        </p>
+                        <p class="text-gray-700 text-lg mb-4">
+                            There are many possibilities to expand this app, but I want to do it in cooperation with companies that need it, to fulfill their needs 100%.
+                        </p>
+                    </section>
+
+                    <!-- Sekcja: Kontakt -->
+                    <section class="mb-6">
+                        <p class="text-gray-700 text-lg mb-4">
+                            If you are interested, just <strong>contact me</strong>.
+                        </p>
+                        <p class="text-gray-700 text-lg mb-4">
+                            Wish you the best,<br>
+                            <strong>Szymon Turek</strong>
+                        </p>
+                    </section>
+
+                    <!-- Sekcja: Informacje kontaktowe -->
+                    <section class="bg-gray-50 p-4 rounded-lg">
+                        <ul class="space-y-2 text-gray-700 text-sm">
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-phone-alt text-blue-600"></i>
+                                <span>+48 537 757 451</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-envelope text-blue-600"></i>
+                                <span>szymonturek.work@gmail.com</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fab fa-linkedin text-blue-600"></i>
+                                <a href="https://www.linkedin.com/in/szymon-turek-343374181/?originalSubdomain=pl" target="_blank" class="underline text-blue-600">
+                                    LinkedIn Profile
+                                </a>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+                </div>
+            </div>
             <!-- === STRONA: DOSTAWY === -->
             <div id="deliveries-page" class="page-container hidden">
                 <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
@@ -147,7 +212,14 @@
     </div>
 
     <div id="create-order-modal" class="modal hidden">
-        <div class="modal-content"><h3 class="text-xl font-semibold mb-4">Create New Order</h3><form id="create-order-form"><div class="mb-4"><label for="warehouse_id" class="form-label">Warehouse ID</label><input type="number" id="warehouse_id" name="warehouse_id" required class="form-input"></div><div class="mb-4"><label for="supplier_id" class="form-label">Supplier ID</label><input type="number" id="supplier_id" name="supplier_id" required class="form-input"></div><div class="modal-actions"><button type="button" data-action="close-modal" class="btn-secondary">Cancel</button><button type="submit" class="btn-primary">Create</button></div></form></div>
+        <div class="modal-content"><h3 class="text-xl font-semibold mb-4">Create New Order</h3><form id="create-order-form"><div class="mb-4">
+    <label for="warehouse_id" class="form-label block font-medium text-gray-700">Warehouse ID</label>
+    <input type="number" id="warehouse_id" name="warehouse_id" required class="form-input mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+</div>
+<div class="mb-4">
+    <label for="supplier_id" class="form-label block font-medium text-gray-700">Supplier ID</label>
+    <input type="number" id="supplier_id" name="supplier_id" required class="form-input mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+</div><div class="modal-actions"><button type="button" data-action="close-modal" class="btn-secondary">Cancel</button><button type="submit" class="btn-primary ml-6">Create</button></div></form></div>
     </div>
     <div id="add-product-modal" class="modal hidden">
         <div class="modal-content"><h3 class="text-xl font-semibold mb-4">Add Product</h3><form id="add-product-form"><input type="hidden" name="order_id" id="add-product-order-id"><div class="mb-4"><label for="product_sku" class="form-label">Product SKU</label><input type="text" id="product_sku" name="product_sku" required class="form-input"></div><div class="mb-4"><label for="qty" class="form-label">QTY</label><input type="number" id="qty" name="qty" required min="1" class="form-input"></div><div class="modal-actions"><button type="button" data-action="close-modal" class="btn-secondary">Cancel</button><button type="submit" class="btn-primary">Add</button></div></form></div>
