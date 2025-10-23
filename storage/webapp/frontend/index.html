@@ -13,17 +13,17 @@
         <!-- Panel Boczny (Nawigacja) -->
         <aside class="w-64 bg-white shadow-md flex flex-col">
             <div class="p-6 border-b">
-                <h1 class="text-2xl font-bold text-blue-600">Magazyn PRO</h1>
+                <h1 class="text-2xl font-bold text-blue-600">Storage Manager System</h1>
             </div>
-            <nav id="main-nav" class="mt-4 flex-1">
+            <nav id="main-nav" class="mt-8 flex flex-col flex-1 gap-5 ml-6">
                 <a href="#" class="nav-link" data-page="deliveries">
-                    <i class="fas fa-truck-loading fa-fw mr-3"></i>Dostawy
+                    <i class="fas fa-truck-loading fa-fw mr-3"></i>Deliveries
                 </a>
                 <a href="#" class="nav-link" data-page="stock-summary">
-                    <i class="fas fa-boxes fa-fw mr-3"></i>Stany Magazynowe
+                    <i class="fas fa-boxes fa-fw mr-3"></i>Stock
                 </a>
                 <a href="#" class="nav-link" data-page="stock-exp-date">
-                    <i class="fas fa-calendar-alt fa-fw mr-3"></i>Stany z Datami
+                    <i class="fas fa-calendar-alt fa-fw mr-3"></i>Stock with Exp. Dates
                 </a>
             </nav>
         </aside>
@@ -33,25 +33,25 @@
             <!-- === STRONA: DOSTAWY === -->
             <div id="deliveries-page" class="page-container hidden">
                 <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800">Dostawy Przychodzące</h1>
+                    <h1 class="text-3xl font-bold text-gray-800">Deliveries</h1>
                     <button id="show-create-order-modal-btn" class="mt-4 sm:mt-0 btn-primary flex items-center">
-                        <i class="fas fa-plus mr-2"></i> Nowe Zamówienie
+                        <i class="fas fa-plus mr-2"></i> New Inbound Order
                     </button>
                 </header>
                 <div class="bg-white p-4 rounded-lg shadow-md mb-6">
                     <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-lg font-semibold text-gray-700">Filtry Dostaw</h2>
+                        <h2 class="text-lg font-semibold text-gray-700">Filters</h2>
                         <button id="reset-deliveries-filters-btn" class="btn-reset">
-                            <i class="fas fa-times-circle mr-1"></i> Resetuj
+                            <i class="fas fa-times-circle mr-1"></i> Reset
                         </button>
                     </div>
                     <form id="deliveries-filters-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label for="deliveries-filter-warehouse-id" class="form-label">ID Magazynu</label>
-                            <input type="number" id="deliveries-filter-warehouse-id" name="warehouse_id" class="form-input" placeholder="np. 1">
+                            <label for="deliveries-filter-warehouse-id" class="form-label">Warehouse ID</label>
+                            <input type="number" id="deliveries-filter-warehouse-id" name="warehouse_id" class="form-input" placeholder="e.g. 1">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="form-label">Statusy</label>
+                            <label class="form-label">Delivery Order Status</label>
                             <div id="status-filter-container" class="mt-2 flex flex-wrap gap-x-4 gap-y-2"></div>
                         </div>
                     </form>
@@ -62,36 +62,36 @@
             <!-- === STRONA: STANY MAGAZYNOWE === -->
             <div id="stock-summary-page" class="page-container hidden">
                 <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800">Podsumowanie Stanów Magazynowych</h1>
+                    <h1 class="text-3xl font-bold text-gray-800">Stock Summary</h1>
                     <div class="flex gap-2 mt-4 sm:mt-0">
-                        <button id="update-inbound-qty-btn" class="btn-secondary flex items-center" title="Aktualizuje pole 'W dostawie' na podstawie zatwierdzonych zamówień">
-                            <i class="fas fa-sync-alt mr-2"></i> Akt. Ilości w Dostawach
+                        <button id="update-inbound-qty-btn" class="btn-secondary flex items-center" title="Update quantity of products that are not in status 'created', 'canceled' or 'completed'.">
+                            <i class="fas fa-sync-alt mr-2"></i> Update Inbound Qty
                         </button>
-                        <button id="update-stock-btn" class="btn-primary flex items-center" title="Przelicza daty ważności i stany produktów">
-                            <i class="fas fa-cogs mr-2"></i> Akt. Stany Magazynowe
+                        <button id="update-stock-btn" class="btn-primary flex items-center" title="Update qty of products, by calling external API for stock data and recalculate it.">
+                            <i class="fas fa-cogs mr-2"></i> Update Stock
                         </button>
                     </div>
                 </header>
                 <div class="bg-white p-4 rounded-lg shadow-md mb-6">
                      <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-lg font-semibold text-gray-700">Filtry Stanów</h2>
+                        <h2 class="text-lg font-semibold text-gray-700">Filters</h2>
                         <button id="reset-stock-filters-btn" class="btn-reset">
-                            <i class="fas fa-times-circle mr-1"></i> Resetuj
+                            <i class="fas fa-times-circle mr-1"></i> Reset
                         </button>
                     </div>
                     <form id="stock-filters-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                             <label for="stock-filter-warehouse-id" class="form-label">ID Magazynu</label>
-                             <input type="number" id="stock-filter-warehouse-id" name="warehouse_id" class="form-input" placeholder="Filtruj wg magazynu">
+                             <label for="stock-filter-warehouse-id" class="form-label">Warehouse ID</label>
+                             <input type="number" id="stock-filter-warehouse-id" name="warehouse_id" class="form-input" placeholder="Filter by Warehouse ID">
                         </div>
                         <div>
-                             <label for="stock-filter-sku" class="form-label">SKU Produktu</label>
-                             <input type="text" id="stock-filter-sku" name="sku" class="form-input" placeholder="np. PROD-001">
+                             <label for="stock-filter-sku" class="form-label">Product SKU</label>
+                             <input type="text" id="stock-filter-sku" name="sku" class="form-input" placeholder="e.g. SKU-1">
                         </div>
                         <div>
-                             <label for="stock-filter-status" class="form-label">Status Ilości</label>
+                             <label for="stock-filter-status" class="form-label">Quantity Status</label>
                              <select id="stock-filter-status" name="status_of_total_qty" class="form-input">
-                                 <option value="">Wszystkie</option>
+                                 <option value="">All</option>
                                  <option value="GOOD">GOOD</option>
                                  <option value="MEDIUM">MEDIUM</option>
                                  <option value="CRITICAL">CRITICAL</option>
@@ -107,31 +107,31 @@
             <!-- === STRONA: STANY Z DATAMI WAŻNOŚCI === -->
             <div id="stock-exp-date-page" class="page-container hidden">
                 <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800">Stany z Datami Ważności</h1>
+                    <h1 class="text-3xl font-bold text-gray-800">Stock With Exp. Date</h1>
                     <div class="flex gap-2 mt-4 sm:mt-0">
-                        <button id="update-stock-exp-date-btn" class="btn-primary flex items-center" title="Przelicza daty ważności produktów">
-                            <i class="fas fa-cogs mr-2"></i> Akt. Stany z Datami
+                        <button id="update-stock-exp-date-btn" class="btn-primary flex items-center" title="Update qty of products, by calling external API for stock data and recalculate it.">
+                            <i class="fas fa-cogs mr-2"></i> Update Stock with Exp. Date
                         </button>
                     </div>
                 </header>
                 <div class="bg-white p-4 rounded-lg shadow-md mb-6">
                      <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-lg font-semibold text-gray-700">Filtry</h2>
+                        <h2 class="text-lg font-semibold text-gray-700">Filters</h2>
                         <button id="reset-stock-exp-filters-btn" class="btn-reset">
-                            <i class="fas fa-times-circle mr-1"></i> Resetuj
+                            <i class="fas fa-times-circle mr-1"></i> Reset
                         </button>
                     </div>
                     <form id="stock-exp-filters-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                             <label for="stock-exp-filter-warehouse-id" class="form-label">ID Magazynu</label>
-                             <input type="number" id="stock-exp-filter-warehouse-id" name="warehouse_id" class="form-input" placeholder="Filtruj wg magazynu">
+                             <label for="stock-exp-filter-warehouse-id" class="form-label">Warehouse ID</label>
+                             <input type="number" id="stock-exp-filter-warehouse-id" name="warehouse_id" class="form-input" placeholder="Filter by Warehouse ID">
                         </div>
                         <div>
-                             <label for="stock-exp-filter-sku" class="form-label">SKU Produktu</label>
-                             <input type="text" id="stock-exp-filter-sku" name="sku" class="form-input" placeholder="np. PROD-001">
+                             <label for="stock-exp-filter-sku" class="form-label">Product SKU</label>
+                             <input type="text" id="stock-exp-filter-sku" name="sku" class="form-input" placeholder="np. SKU-1">
                         </div>
                         <div>
-                             <label for="stock-exp-filter-exp-date" class="form-label">Data Ważności</label>
+                             <label for="stock-exp-filter-exp-date" class="form-label">Exp. Date</label>
                              <input type="date" id="stock-exp-filter-exp-date" name="exp_date" class="form-input">
                         </div>
                     </form>
@@ -141,16 +141,16 @@
 
             <div id="loader" class="text-center py-10 hidden">
                 <div class="spinner"></div>
-                <p class="mt-2 text-gray-500">Ładowanie danych...</p>
+                <p class="mt-2 text-gray-500">Loading data...</p>
             </div>
         </div>
     </div>
 
     <div id="create-order-modal" class="modal hidden">
-        <div class="modal-content"><h3 class="text-xl font-semibold mb-4">Utwórz Nowe Zamówienie</h3><form id="create-order-form"><div class="mb-4"><label for="warehouse_id" class="form-label">ID Magazynu</label><input type="number" id="warehouse_id" name="warehouse_id" required class="form-input"></div><div class="mb-4"><label for="supplier_id" class="form-label">ID Dostawcy</label><input type="number" id="supplier_id" name="supplier_id" required class="form-input"></div><div class="modal-actions"><button type="button" data-action="close-modal" class="btn-secondary">Anuluj</button><button type="submit" class="btn-primary">Utwórz</button></div></form></div>
+        <div class="modal-content"><h3 class="text-xl font-semibold mb-4">Create New Order</h3><form id="create-order-form"><div class="mb-4"><label for="warehouse_id" class="form-label">Warehouse ID</label><input type="number" id="warehouse_id" name="warehouse_id" required class="form-input"></div><div class="mb-4"><label for="supplier_id" class="form-label">Supplier ID</label><input type="number" id="supplier_id" name="supplier_id" required class="form-input"></div><div class="modal-actions"><button type="button" data-action="close-modal" class="btn-secondary">Cancel</button><button type="submit" class="btn-primary">Create</button></div></form></div>
     </div>
     <div id="add-product-modal" class="modal hidden">
-        <div class="modal-content"><h3 class="text-xl font-semibold mb-4">Dodaj Produkt do Zamówienia</h3><form id="add-product-form"><input type="hidden" name="order_id" id="add-product-order-id"><div class="mb-4"><label for="product_sku" class="form-label">SKU Produktu</label><input type="text" id="product_sku" name="product_sku" required class="form-input"></div><div class="mb-4"><label for="qty" class="form-label">Ilość</label><input type="number" id="qty" name="qty" required min="1" class="form-input"></div><div class="modal-actions"><button type="button" data-action="close-modal" class="btn-secondary">Anuluj</button><button type="submit" class="btn-primary">Dodaj</button></div></form></div>
+        <div class="modal-content"><h3 class="text-xl font-semibold mb-4">Add Product</h3><form id="add-product-form"><input type="hidden" name="order_id" id="add-product-order-id"><div class="mb-4"><label for="product_sku" class="form-label">Product SKU</label><input type="text" id="product_sku" name="product_sku" required class="form-input"></div><div class="mb-4"><label for="qty" class="form-label">QTY</label><input type="number" id="qty" name="qty" required min="1" class="form-input"></div><div class="modal-actions"><button type="button" data-action="close-modal" class="btn-secondary">Cancel</button><button type="submit" class="btn-primary">Add</button></div></form></div>
     </div>
 
     <!-- ✅ POPRAWIONE: Załaduj skrypty jako moduły ES6 -->
